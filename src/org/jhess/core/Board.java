@@ -19,6 +19,7 @@ public class Board {
         initializeSquares(whitePieces, blackPieces, whitePawns, blackPawns);
     }
 
+    // TODO: Use a factory to generate a standard board, or to generate one from FEN
 
     private List<Piece> generatePieces(Alliance alliance) {
         List<Piece> pieces = new ArrayList<>();

@@ -3,7 +3,6 @@ package org.jhess.ui;
 
 public class Program{
     public static void main(String[] args){
-        MainMenu mainMenu = new MainMenu();
-        mainMenu.setVisible(true);
+        new MainMenu().setVisible(true);
     }
 }
