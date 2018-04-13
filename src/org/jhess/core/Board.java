@@ -8,7 +8,7 @@ import java.util.List;
 public class Board {
     private final Square[][] squares = new Square[8][8];
 
-    public Board() {
+    private Board() {
 
         List<Piece> whitePieces = generatePieces(Alliance.White);
         List<Piece> blackPieces = generatePieces(Alliance.Black);
@@ -19,8 +19,11 @@ public class Board {
         initializeSquares(whitePieces, blackPieces, whitePawns, blackPawns);
     }
 
-    // TODO: Use a factory to generate a standard board, or to generate one from FEN
-
+    /**
+     * Generates a list of the pieces.
+     * @param alliance
+     * @return
+     */
     private List<Piece> generatePieces(Alliance alliance) {
         List<Piece> pieces = new ArrayList<>();
 
@@ -36,6 +39,11 @@ public class Board {
         return pieces;
     }
 
+    /**
+     * Generates a list of pawns.
+     * @param alliance
+     * @return
+     */
     private List<Piece> generatePawns(Alliance alliance) {
         List<Piece> pieces = new ArrayList<>();
 
@@ -46,6 +54,13 @@ public class Board {
         return pieces;
     }
 
+    /**
+     * Places the pieces in their default places.
+     * @param whitePieces
+     * @param blackPieces
+     * @param whitePawns
+     * @param blackPawns
+     */
     private void initializeSquares(List<Piece> whitePieces, List<Piece> blackPieces,
                                    List<Piece> whitePawns, List<Piece> blackPawns) {
         for (int i = 0; i < 8; i++) {
@@ -60,5 +75,13 @@ public class Board {
 
     public Square[][] getSquares() {
         return squares;
+    }
+
+    /**
+     * Returns an instance of a standard board.
+     * @return
+     */
+    public static Board getStandardBoard(){
+        return new Board();
     }
 }
