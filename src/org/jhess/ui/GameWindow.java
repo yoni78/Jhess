@@ -5,10 +5,14 @@ import java.awt.*;
 
 class GameWindow extends JFrame {
 
-    private GameBoard board = new GameBoard();
+    private BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
+
+    private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 400);
 
     GameWindow() {
         setTitle("Jhess");
+
+        setLayout(new BorderLayout());
 
         setSize(600, 600);
         setResizable(false);
@@ -30,6 +34,6 @@ class GameWindow extends JFrame {
     }
 
     private void initPanel() {
-        add(board);
+        add(boardPanel, BorderLayout.CENTER);
     }
 }

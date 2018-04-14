@@ -9,4 +9,8 @@ public abstract class Piece {
     public Piece(Alliance alliance) {
         this.alliance = alliance;
     }
+
+    public Alliance getAlliance() {
+        return alliance;
+    }
 }

@@ -1,6 +1,7 @@
 package org.jhess.core;
 
 import org.jhess.core.pieces.*;
+import org.jhess.utils.SquareUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +9,13 @@ import java.util.List;
 public class Board {
     private final Square[][] squares = new Square[8][8];
 
-    private Board() {
+    public Board() {
 
-        List<Piece> whitePieces = generatePieces(Alliance.White);
-        List<Piece> blackPieces = generatePieces(Alliance.Black);
+        List<Piece> whitePieces = generatePieces(Alliance.WHITE);
+        List<Piece> blackPieces = generatePieces(Alliance.BLACK);
 
-        List<Piece> whitePawns = generatePawns(Alliance.White);
-        List<Piece> blackPawns = generatePawns(Alliance.Black);
+        List<Piece> whitePawns = generatePawns(Alliance.WHITE);
+        List<Piece> blackPawns = generatePawns(Alliance.BLACK);
 
         initializeSquares(whitePieces, blackPieces, whitePawns, blackPawns);
     }
@@ -70,6 +71,10 @@ public class Board {
 
             squares[1][i] = new Square(whitePawns.get(i));
             squares[6][i] = new Square(blackPawns.get(i));
+
+            for (int j = 2; j < 6; j++) {
+                squares[j][i] = new Square();
+            }
         }
     }
 
@@ -77,11 +82,11 @@ public class Board {
         return squares;
     }
 
-    /**
-     * Returns an instance of a standard board.
-     * @return
-     */
-    public static Board getStandardBoard(){
-        return new Board();
+    public Square getSquare(int squareId){
+        int row = SquareUtils.getSquareRow(squareId);
+        int file = SquareUtils.getSquareFile(squareId);
+
+        return getSquares()[row][file];
     }
+
 }

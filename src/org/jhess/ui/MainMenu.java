@@ -8,6 +8,7 @@ class MainMenu extends JFrame {
 
     private final JPanel panel = new JPanel();
     private final JButton bNewGame = new JButton("New Game");
+    private final JButton bExit = new JButton("Exit");
 
     MainMenu(){
         setTitle("Jhess");
@@ -21,6 +22,7 @@ class MainMenu extends JFrame {
         initPanel();
 
         bNewGame.addActionListener(this::bNewGameClicked);
+        bExit.addActionListener(this::bExitClicked);
     }
 
     private void centerWindow(){
@@ -34,12 +36,19 @@ class MainMenu extends JFrame {
     }
 
     private void initPanel(){
+        panel.setLayout(new GridLayout(4, 1));
+
         panel.add(bNewGame);
+        panel.add(bExit);
 
         add(panel);
     }
 
     private void bNewGameClicked(ActionEvent e){
         new GameWindow().setVisible(true);
+    }
+
+    private void bExitClicked(ActionEvent e){
+        System.exit(0);
     }
 }
