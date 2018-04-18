@@ -1,7 +1,8 @@
 package org.jhess.ui;
 
-import org.jhess.core.Board;
-import org.jhess.core.Square;
+import org.jhess.core.Move;
+import org.jhess.core.board.Board;
+import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
 import org.jhess.utils.SquareUtils;
 
@@ -18,8 +19,8 @@ class BoardPanel extends JPanel implements SquareClickHandler{
 
     private final List<SquarePanel> squarePanels;
     private Board board = new Board();
-    private Square srcSquare;
-    private Square destSquare;
+    private int srcSquare = -1;
+    private int destSquare = -1;
     private Piece pieceToMove;
 
 
@@ -73,29 +74,32 @@ class BoardPanel extends JPanel implements SquareClickHandler{
 
         if (isLeftMouseButton(e)){
 
-            if (srcSquare == null){
-                srcSquare = board.getSquare(squareId);
-                pieceToMove = srcSquare.getPiece();
+            if (srcSquare == -1){
+                srcSquare = squareId;
+                pieceToMove = board.getSquare(squareId).getPiece();
 
                 if (pieceToMove == null){
-                    srcSquare = null;
+                    srcSquare = -1;
                 }
 
             } else {
-                destSquare = board.getSquare(squareId);
-                srcSquare.setPiece(null);
-                destSquare.setPiece(pieceToMove);
+                destSquare = squareId;
 
-                srcSquare = null;
-                destSquare = null;
+                if (Move.isValidMove(board, srcSquare, destSquare)){
+                    board.getSquare(srcSquare).setPiece(null);
+                    board.getSquare(destSquare).setPiece(pieceToMove);
+                }
+
+                srcSquare = -1;
+                destSquare = -1;
                 pieceToMove = null;
             }
 
             SwingUtilities.invokeLater(() -> drawBoard(board));
 
         } else if (isRightMouseButton(e)){
-            srcSquare = null;
-            destSquare = null;
+            srcSquare = -1;
+            destSquare = -1;
             pieceToMove = null;
         }
     }

@@ -1,7 +1,7 @@
 package org.jhess.ui;
 
-import org.jhess.core.Board;
-import org.jhess.core.Square;
+import org.jhess.core.board.Board;
+import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
 import org.jhess.utils.SquareUtils;
 

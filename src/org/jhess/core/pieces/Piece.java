@@ -4,7 +4,7 @@ import org.jhess.core.Alliance;
 
 public abstract class Piece {
 
-    private Alliance alliance;
+    protected Alliance alliance;
 
     public Piece(Alliance alliance) {
         this.alliance = alliance;
@@ -13,4 +13,6 @@ public abstract class Piece {
     public Alliance getAlliance() {
         return alliance;
     }
+
+    public abstract int[] getMoveList();
 }

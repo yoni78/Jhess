@@ -1,11 +1,11 @@
-package org.jhess.core;
+package org.jhess.core.board;
 
 import org.jhess.core.pieces.Piece;
 
 public class Square {
     private Piece piece;
 
-    public Square() {
+    Square() {
         this(null);
     }
 

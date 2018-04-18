@@ -43,4 +43,13 @@ public final class SquareUtils {
     public static int getSquareId(int squareRow, int squareFile) {
         return squareRow * 8 + squareFile;
     }
+
+    /**
+     * Determines whether the given square is a valid square.
+     * @param squareId The ID of the square.
+     * @return If the square is in the board or not.
+     */
+    public static boolean isInBoard(int squareId){
+        return squareId >= 0 && squareId <= 63;
+    }
 }

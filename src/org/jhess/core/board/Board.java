@@ -1,5 +1,6 @@
-package org.jhess.core;
+package org.jhess.core.board;
 
+import org.jhess.core.Alliance;
 import org.jhess.core.pieces.*;
 import org.jhess.utils.SquareUtils;
 
@@ -22,8 +23,8 @@ public class Board {
 
     /**
      * Generates a list of the pieces.
-     * @param alliance
-     * @return
+     * @param alliance The alliance of the pieces.
+     * @return A list of all the pieces with the given alliance.
      */
     private List<Piece> generatePieces(Alliance alliance) {
         List<Piece> pieces = new ArrayList<>();
@@ -42,8 +43,8 @@ public class Board {
 
     /**
      * Generates a list of pawns.
-     * @param alliance
-     * @return
+     * @param alliance The alliance of the pawns.
+     * @return  A list eight pawns with the given alliance.
      */
     private List<Piece> generatePawns(Alliance alliance) {
         List<Piece> pieces = new ArrayList<>();
@@ -57,10 +58,10 @@ public class Board {
 
     /**
      * Places the pieces in their default places.
-     * @param whitePieces
-     * @param blackPieces
-     * @param whitePawns
-     * @param blackPawns
+     * @param whitePieces A list of the white pieces.
+     * @param blackPieces A list of the black pieces.
+     * @param whitePawns A list of white pawns.
+     * @param blackPawns A list of black pawns.
      */
     private void initializeSquares(List<Piece> whitePieces, List<Piece> blackPieces,
                                    List<Piece> whitePawns, List<Piece> blackPawns) {
