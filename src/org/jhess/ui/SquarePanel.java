@@ -8,6 +8,8 @@ import org.jhess.utils.SquareUtils;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,16 +17,19 @@ import java.text.MessageFormat;
 
 class SquarePanel extends JPanel {
     private final int squareId;
+    private BoardPanel boardPanel;
 
     SquarePanel(BoardPanel boardPanel, int squareId, Dimension dimension) {
         super(new GridBagLayout());
 
         this.squareId = squareId;
+        this.boardPanel = boardPanel;
 
         setPreferredSize(dimension);
+        addMouseControls();
 
         assignSquareColor();
-        assignSquarePieceIcon(boardPanel.getBoard());
+        assignSquarePieceIcon(this.boardPanel.getBoard());
 
         validate();
     }
@@ -64,5 +69,41 @@ class SquarePanel extends JPanel {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void addMouseControls (){
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                boardPanel.handleSquareClicked(e, squareId);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+    }
+
+    void drawSquare(Board board){
+        assignSquareColor();
+        assignSquarePieceIcon(board);
+        validate();
+        repaint();
     }
 }
