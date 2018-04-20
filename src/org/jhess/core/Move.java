@@ -47,16 +47,20 @@ public class Move {
                 destSquare.getFile() - srcSquare.getFile());
 
         Piece piece = srcSquare.getPiece();
+        Piece otherPiece = destSquare.getPiece();
 
-        // If the move isn't in the piece's possible move list
-        if (!piece.getMoveList().contains(move)) {
+        // If the destination square contains a friendly piece
+        if (destSquare.isOccupied() && otherPiece.getAlliance() == piece.getAlliance()) {
             return false;
         }
 
-        // If the destination square contains a friendly piece
-        Piece otherPiece = destSquare.getPiece();
+        // If it's a pawn and it can capture
+        if (piece instanceof Pawn && destSquare.isOccupied() && (move.equals(FORWARD_RIGHT) || move.equals(FORWARD_LEFT))){
+            return true;
+        }
 
-        if (destSquare.isOccupied() && otherPiece.getAlliance() == piece.getAlliance()) {
+        // If the move isn't in the piece's possible move list
+        if (!piece.getMoveList().contains(move)) {
             return false;
         }
 
