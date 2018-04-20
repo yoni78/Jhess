@@ -1,6 +1,9 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.Move;
+
+import java.util.List;
 
 public abstract class Piece {
 
@@ -14,5 +17,5 @@ public abstract class Piece {
         return alliance;
     }
 
-    public abstract int[] getMoveList();
+    public abstract List<Move> getMoveList();
 }

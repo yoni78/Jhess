@@ -1,9 +1,7 @@
 package org.jhess.ui;
 
-import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
-import org.jhess.utils.SquareUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,66 +14,31 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 class SquarePanel extends JPanel {
-    private final int squareId;
+
+    private final Square square;
     private BoardPanel boardPanel;
 
-    SquarePanel(BoardPanel boardPanel, int squareId, Dimension dimension) {
+    SquarePanel(BoardPanel boardPanel, Square square, Dimension dimension) {
         super(new GridBagLayout());
 
-        this.squareId = squareId;
+        this.square = square;
         this.boardPanel = boardPanel;
 
         setPreferredSize(dimension);
         addMouseControls();
 
-        assignSquareColor();
-        assignSquarePieceIcon(this.boardPanel.getBoard());
+        drawSquare();
 
         validate();
     }
 
     // TODO: Move both assign methods to BoardPanel
 
-    private void assignSquareColor() {
-        Color lightTileColor = Color.decode("#FFFACD");
-        Color darkTileColor = Color.decode("#593E1A");
-
-        int tileRow = SquareUtils.getSquareRow(squareId);
-        int tileCol = SquareUtils.getSquareFile(squareId);
-
-        boolean isRowEven = tileRow % 2 == 0;
-        boolean isColEven = tileCol % 2 == 0;
-
-        setBackground(isRowEven == isColEven ? darkTileColor : lightTileColor);
-    }
-
-    private void assignSquarePieceIcon(Board board) {
-        removeAll();
-
-        String pathPattern = "resources/images/pieces/{0}/{1}.png";
-        Square square = board.getSquare(squareId);
-
-        if (square.isOccupied()) {
-            Piece piece = square.getPiece();
-
-            String alliance = piece.getAlliance().toString().toLowerCase();
-            String pieceType = piece.getClass().getSimpleName().toLowerCase();
-
-            try {
-                BufferedImage image = ImageIO.read(new File(MessageFormat.format(pathPattern, alliance, pieceType)));
-                add(new JLabel(new ImageIcon(image)));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void addMouseControls (){
+    private void addMouseControls() {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                boardPanel.handleSquareClicked(e, squareId);
+                boardPanel.handleSquareClicked(e, square.getRank(), square.getFile());
             }
 
             @Override
@@ -100,9 +63,57 @@ class SquarePanel extends JPanel {
         });
     }
 
-    void drawSquare(Board board){
+    private void assignSquareColor() {
+        Color lightTileColor = Color.decode("#FFFACD");
+        Color darkTileColor = Color.decode("#593E1A");
+
+        boolean isRowEven = square.getRank() % 2 == 0;
+        boolean isColEven = square.getFile() % 2 == 0;
+
+        setBackground(isRowEven == isColEven ? darkTileColor : lightTileColor);
+    }
+
+    private void assignSquarePieceIcon() {
+        removeAll();
+
+        String pathPattern = "resources/images/pieces/{0}/{1}.png";
+
+        if (square.isOccupied()) {
+            Piece piece = square.getPiece();
+
+            String alliance = piece.getAlliance().toString().toLowerCase();
+            String pieceType = piece.getClass().getSimpleName().toLowerCase();
+
+            try {
+                BufferedImage image = ImageIO.read(new File(MessageFormat.format(pathPattern, alliance, pieceType)));
+                add(new JLabel(new ImageIcon(image)));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void highLightBorder() {
+
+        Piece pieceToMove = boardPanel.getPieceToMove();
+
+        if (pieceToMove != null &&
+                pieceToMove.getAlliance() == boardPanel.getPlayerToMove() &&
+                boardPanel.getSrcSquare() == square) {
+
+            setBorder(BorderFactory.createLineBorder(Color.cyan));
+
+        } else {
+            setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        }
+    }
+
+    void drawSquare() {
         assignSquareColor();
-        assignSquarePieceIcon(board);
+        assignSquarePieceIcon();
+        highLightBorder();
+
         validate();
         repaint();
     }

@@ -1,6 +1,12 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.Move;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.jhess.core.Move.*;
 
 public class Rook extends Piece {
     public Rook(Alliance alliance) {
@@ -8,10 +14,16 @@ public class Rook extends Piece {
     }
 
     @Override
-    public int[] getMoveList() {
-        return new int[]{8, 16, 24, 32, 40, 48, 56,
-                -8, -16, -24, -32, -40, -48, -56,
-                1, 2, 3, 4, 5, 6, 7,
-                -1, -2, -3, -4,- 5, -6, -7};
+    public List<Move> getMoveList() {
+        Move[] baseMoves = {FORWARD, BACKWARD, RIGHT, LEFT};
+        List<Move> moveList = new ArrayList<>();
+
+        for(Move baseMove : baseMoves){
+            for (int i = 0; i < 8; i++) {
+                moveList.add(baseMove.extend(i));
+            }
+        }
+
+        return moveList;
     }
 }

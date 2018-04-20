@@ -1,6 +1,13 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.Move;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.jhess.core.Move.BACKWARD;
+import static org.jhess.core.Move.FORWARD;
 
 public class Pawn extends Piece {
 
@@ -10,7 +17,15 @@ public class Pawn extends Piece {
 
     // TODO: Add capture moves
     @Override
-    public int[] getMoveList() {
-        return new int[]{8};
+    public List<Move> getMoveList() {
+        List<Move> moveList = new ArrayList<>();
+
+        if (alliance == Alliance.WHITE) {
+            moveList.add(FORWARD);
+
+        } else {
+            moveList.add(BACKWARD);
+        }
+        return moveList;
     }
 }

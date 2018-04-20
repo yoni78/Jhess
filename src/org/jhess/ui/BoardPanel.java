@@ -1,10 +1,10 @@
 package org.jhess.ui;
 
+import org.jhess.core.Alliance;
 import org.jhess.core.Move;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
-import org.jhess.utils.SquareUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,19 +15,19 @@ import java.util.List;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
-class BoardPanel extends JPanel implements SquareClickHandler{
+class BoardPanel extends JPanel implements SquareClickHandler {
 
     private final List<SquarePanel> squarePanels;
     private Board board = new Board();
-    private int srcSquare = -1;
-    private int destSquare = -1;
+    private Square srcSquare = null;
+    private Square destSquare = null;
     private Piece pieceToMove;
-
+    private Alliance playerToMove = Alliance.WHITE;
 
     private final Dimension SQUARE_PANEL_DIMENSION = new Dimension(10, 10);
 
     BoardPanel(Dimension dimension) {
-        super(new GridLayout(8,8));
+        super(new GridLayout(8, 8));
         squarePanels = new ArrayList<>();
 
         populateSquares();
@@ -36,32 +36,25 @@ class BoardPanel extends JPanel implements SquareClickHandler{
         validate();
     }
 
-    Board getBoard(){
-        return board;
-    }
+    private void populateSquares() {
 
-    private void populateSquares(){
-        for (int i = 0; i < 64; i++) {
-            int squareRow = SquareUtils.getSquareRow(i);
-            int squareFile = SquareUtils.getSquareFile(i);
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
 
-            // To reverse the position of the pieces
-            squareRow = 7 - squareRow;
+                int newRank =  7 - i;
+                SquarePanel squarePanel = new SquarePanel(this, board.getSquares()[newRank][j], SQUARE_PANEL_DIMENSION);
 
-            int squareId = SquareUtils.getSquareId(squareRow, squareFile);
-
-            SquarePanel squarePanel = new SquarePanel(this, squareId, SQUARE_PANEL_DIMENSION);
-
-            squarePanels.add(squarePanel);
-            add(squarePanel);
+                squarePanels.add(squarePanel);
+                add(squarePanel);
+            }
         }
     }
 
-    private void drawBoard(Board board){
+    private void drawBoard() {
         removeAll();
 
-        for(SquarePanel squarePanel : squarePanels){
-            squarePanel.drawSquare(board);
+        for (SquarePanel squarePanel : squarePanels) {
+            squarePanel.drawSquare();
             add(squarePanel);
         }
 
@@ -69,38 +62,67 @@ class BoardPanel extends JPanel implements SquareClickHandler{
         repaint();
     }
 
+    private void nextTurn() {
+        if (playerToMove == Alliance.WHITE) {
+            playerToMove = Alliance.BLACK;
+
+        } else {
+            playerToMove = Alliance.WHITE;
+        }
+    }
+
+    Board getBoard() {
+        return board;
+    }
+
+    public Piece getPieceToMove() {
+        return pieceToMove;
+    }
+
+    public Alliance getPlayerToMove() {
+        return playerToMove;
+    }
+
+    public Square getSrcSquare() {
+        return srcSquare;
+    }
+
     @Override
-    public void handleSquareClicked(MouseEvent e, int squareId){
+    public void handleSquareClicked(MouseEvent e, int rank, int file) {
 
-        if (isLeftMouseButton(e)){
+        if (isLeftMouseButton(e)) {
 
-            if (srcSquare == -1){
-                srcSquare = squareId;
-                pieceToMove = board.getSquare(squareId).getPiece();
+            if (srcSquare == null) {
+                srcSquare = board.getSquares()[rank][file];
+                pieceToMove = srcSquare.getPiece();
 
-                if (pieceToMove == null){
-                    srcSquare = -1;
+                if (pieceToMove == null) {
+                    srcSquare = null;
                 }
 
             } else {
-                destSquare = squareId;
+                destSquare = board.getSquares()[rank][file];
 
-                if (Move.isValidMove(board, srcSquare, destSquare)){
-                    board.getSquare(srcSquare).setPiece(null);
-                    board.getSquare(destSquare).setPiece(pieceToMove);
+                if (Move.isValidMove(board, srcSquare, destSquare) && pieceToMove.getAlliance() == playerToMove) {
+                    srcSquare.setPiece(null);
+                    destSquare.setPiece(pieceToMove);
+
+                    nextTurn();
                 }
 
-                srcSquare = -1;
-                destSquare = -1;
+                srcSquare = null;
+                destSquare = null;
                 pieceToMove = null;
             }
 
-            SwingUtilities.invokeLater(() -> drawBoard(board));
+            SwingUtilities.invokeLater(this::drawBoard);
 
-        } else if (isRightMouseButton(e)){
-            srcSquare = -1;
-            destSquare = -1;
+        } else if (isRightMouseButton(e)) {
+            srcSquare = null;
+            destSquare = null;
             pieceToMove = null;
+
+            SwingUtilities.invokeLater(this::drawBoard);
         }
     }
 }
