@@ -20,6 +20,7 @@ public class Pawn extends Piece {
     public List<Move> getMoveList() {
         List<Move> moveList = new ArrayList<>();
 
+        // TODO: Use only forward, and reverse the sign somewhere else
         if (alliance == Alliance.WHITE) {
             moveList.add(FORWARD);
 

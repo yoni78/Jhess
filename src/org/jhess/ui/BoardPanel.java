@@ -2,6 +2,7 @@ package org.jhess.ui;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.Move;
+import org.jhess.core.MoveValidator;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
@@ -103,7 +104,7 @@ class BoardPanel extends JPanel implements SquareClickHandler {
             } else {
                 destSquare = board.getSquares()[rank][file];
 
-                if (Move.isValidMove(board, srcSquare, destSquare) && pieceToMove.getAlliance() == playerToMove) {
+                if (MoveValidator.isValidMove(board, srcSquare, destSquare) && pieceToMove.getAlliance() == playerToMove) {
                     srcSquare.setPiece(null);
                     destSquare.setPiece(pieceToMove);
 
