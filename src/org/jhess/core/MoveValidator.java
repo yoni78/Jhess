@@ -64,8 +64,15 @@ public class MoveValidator {
         // TODO: Check for En-Passant
 
         // If it's a capture move
-        if (destSquare.isOccupied() && (move.equals(FORWARD_RIGHT) || move.equals(FORWARD_LEFT))){
-            return true;
+        if (destSquare.isOccupied()){
+
+            if (piece.getAlliance() == Alliance.WHITE && (move.equals(FORWARD_RIGHT) || move.equals(FORWARD_LEFT))){
+                return true;
+            }
+
+            if (piece.getAlliance() == Alliance.BLACK && (move.equals(BACKWARD_RIGHT) || move.equals(BACKWARD_LEFT))){
+                return true;
+            }
         }
 
         // If it's the pawn's first move
