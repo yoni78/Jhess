@@ -1,4 +1,4 @@
-package org.jhess.core;
+package org.jhess.core.moves;
 
 import org.jhess.core.board.Square;
 

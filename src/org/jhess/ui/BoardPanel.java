@@ -1,13 +1,11 @@
 package org.jhess.ui;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Move;
-import org.jhess.core.MoveValidation;
-import org.jhess.core.MoveValidator;
+import org.jhess.core.moves.MoveValidation;
+import org.jhess.core.moves.MoveValidator;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
-import org.jhess.core.pieces.Rook;
 
 import javax.swing.*;
 import java.awt.*;

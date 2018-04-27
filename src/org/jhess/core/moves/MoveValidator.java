@@ -1,10 +1,11 @@
-package org.jhess.core;
+package org.jhess.core.moves;
 
+import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.*;
 
-import static org.jhess.core.Move.*;
+import static org.jhess.core.moves.Move.*;
 
 public class MoveValidator {
     private MoveValidator() {

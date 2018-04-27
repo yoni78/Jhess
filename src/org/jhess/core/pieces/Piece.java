@@ -1,7 +1,7 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Move;
+import org.jhess.core.moves.Move;
 
 import java.util.List;
 

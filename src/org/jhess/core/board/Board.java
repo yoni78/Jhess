@@ -1,7 +1,7 @@
 package org.jhess.core.board;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Move;
+import org.jhess.core.moves.Move;
 import org.jhess.core.pieces.*;
 
 import java.util.ArrayList;

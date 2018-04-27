@@ -1,12 +1,12 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Move;
+import org.jhess.core.moves.Move;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.core.Move.*;
+import static org.jhess.core.moves.Move.*;
 
 public class Bishop extends Piece {
     public Bishop(Alliance alliance) {

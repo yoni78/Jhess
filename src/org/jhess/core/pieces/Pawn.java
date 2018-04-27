@@ -1,13 +1,13 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Move;
+import org.jhess.core.moves.Move;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.core.Move.BACKWARD;
-import static org.jhess.core.Move.FORWARD;
+import static org.jhess.core.moves.Move.BACKWARD;
+import static org.jhess.core.moves.Move.FORWARD;
 
 public class Pawn extends Piece {
 
