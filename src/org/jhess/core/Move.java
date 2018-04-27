@@ -1,5 +1,7 @@
 package org.jhess.core;
 
+import org.jhess.core.board.Square;
+
 public class Move {
 
     public static final Move FORWARD = new Move(1, 0);
@@ -23,9 +25,14 @@ public class Move {
     private final int rankToAdvance;
     private final int fileToAdvance;
 
-    Move(int rankToAdvance, int fileToAdvance) {
+    private Move(int rankToAdvance, int fileToAdvance) {
         this.rankToAdvance = rankToAdvance;
         this.fileToAdvance = fileToAdvance;
+    }
+
+    public Move(Square srcSquare, Square destSquare) {
+        this(destSquare.getRank() - srcSquare.getRank(),
+                destSquare.getFile() - srcSquare.getFile());
     }
 
     public int getRankToAdvance() {

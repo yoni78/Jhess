@@ -10,6 +10,7 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
+    // TODO: Split method by piece types?
     /**
      * Determines if the given move is a legal one.
      *
@@ -18,44 +19,92 @@ public class MoveValidator {
      * @param destSquare The Destination square.
      * @return Whether the move is legal or not.
      */
-    public static boolean isValidMove(Board board, Square srcSquare, Square destSquare) {
-
-        Move move = new Move(destSquare.getRank() - srcSquare.getRank(),
-                destSquare.getFile() - srcSquare.getFile());
+    public static MoveValidation validateMove(Board board, Square srcSquare, Square destSquare) {
+        Move move = new Move(srcSquare, destSquare);
 
         Piece piece = srcSquare.getPiece();
         Piece otherPiece = destSquare.getPiece();
 
         if (!hasNoPieceInHisWay(board, piece, move, srcSquare)){
-            return false;
+            return new MoveValidation(false);
         }
 
         if (piece instanceof Pawn){
 
             if (isSpecialPawnMove(piece, move, destSquare)){
-                return true;
+                return new MoveValidation(true);
 
             } else if (destSquare.isOccupied()){
-                return false;
+                return new MoveValidation(false);
+            }
+        }
+
+        // Castling
+        if (piece instanceof King && isCastlingMove(move)){
+
+            Square rookSquare = getCastlingRookSquare(board, destSquare, move);
+            Piece rook = rookSquare.getPiece();
+
+            if (piece.isFirstMove() && rook != null && rook.isFirstMove()){
+
+                piece.setFirstMove(false);
+                rook.setFirstMove(false);
+
+                return new MoveValidation(true, true, rookSquare);
             }
         }
 
         // If the destination square contains a friendly piece
-        if (destSquare.isOccupied() && otherPiece.getAlliance() == piece.getAlliance()) {
-            return false;
+         if (destSquare.isOccupied() && otherPiece.getAlliance() == piece.getAlliance()) {
+            return new MoveValidation(false);
         }
 
         // TODO: Check for castling
         // TODO: Handle promotions (not here?)
-
         // If the move is in the piece's possible move list
-        return piece.getMoveList().contains(move);
+        if (piece.getMoveList().contains(move)){
+            return new MoveValidation(true);
+        } else {
+            return new MoveValidation(false);
+        }
+    }
+
+    /**
+     * Gets the rook that should participate in the castling.
+     * @param board The game board.
+     * @param destSquare The destination square of the move.
+     * @param move The move to be played.
+     * @return The rook that should participate in the castling.
+     */
+    private static Square getCastlingRookSquare(Board board, Square destSquare, Move move) {
+
+        Square rookSquare = null;
+
+        // Short
+        if (move.equals(RIGHT.extend(1))){
+            rookSquare = board.getSquares()[destSquare.getRank()][destSquare.getFile() + 1];
+
+        // Long
+        } else if (move.equals(LEFT.extend(1))){
+            rookSquare = board.getSquares()[destSquare.getRank()][destSquare.getFile() - 2];
+        }
+
+        return rookSquare;
+    }
+
+    /**
+     * Checks if the move is a castling move.
+     * @param move The move to check.
+     * @return If it's a castling move.
+     */
+    private static boolean isCastlingMove(Move move) {
+        return move.equals(LEFT.extend(1)) || move.equals(RIGHT.extend(1));
     }
 
     /**
      * Checks special cases for pawn like captures or double moves at the start.
-     * @param piece The piece that was played.
-     * @param move The Move that was played.
+     * @param piece The piece to be played.
+     * @param move The Move to be played.
      * @param destSquare The destination square of the move.
      * @return If there was a valid pawn capture or double move at the start.
      */
@@ -93,10 +142,10 @@ public class MoveValidator {
     }
 
     /**
-     * Checks if the piece attemps to jump over another piece in it's move.
+     * Checks if the piece attempts to jump over another piece in it's move.
      * @param board The game board;
-     * @param piece The piece that was played.
-     * @param move The Move that was played.
+     * @param piece The piece to be played.
+     * @param move The Move to be played.
      * @param srcSquare The source square of the move.
      * @return If the path for the move is clear.
      */

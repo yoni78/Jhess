@@ -15,7 +15,7 @@ public class Pawn extends Piece {
         super(alliance);
     }
 
-    // TODO: Add capture moves
+    // TODO: Add capture moves(?)
     @Override
     public List<Move> getMoveList() {
         List<Move> moveList = new ArrayList<>();

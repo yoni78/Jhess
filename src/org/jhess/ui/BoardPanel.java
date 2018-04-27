@@ -2,16 +2,19 @@ package org.jhess.ui;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.Move;
+import org.jhess.core.MoveValidation;
 import org.jhess.core.MoveValidator;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
+import org.jhess.core.pieces.Rook;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -21,7 +24,6 @@ class BoardPanel extends JPanel implements SquareClickHandler {
     private final List<SquarePanel> squarePanels;
     private Board board = new Board();
     private Square srcSquare = null;
-    private Square destSquare = null;
     private Piece pieceToMove;
     private Alliance playerToMove = Alliance.WHITE;
 
@@ -72,25 +74,45 @@ class BoardPanel extends JPanel implements SquareClickHandler {
         }
     }
 
+    // TODO: 2018-04-27 Move to a different class
+    private void movePiece(Square srcSquare, Square destSquare){
+        destSquare.setPiece(srcSquare.getPiece());
+        srcSquare.setPiece(null);
+    }
+
+    // TODO: 2018-04-27 Move to a different class
+    private Square getCastlingRookSquare(Square rookSquare){
+        if (rookSquare.getFile() == 0){
+            return board.getSquares()[rookSquare.getRank()][3];
+
+        } else if (rookSquare.getFile() == 7){
+            return board.getSquares()[rookSquare.getRank()][5];
+
+        } else {
+            return null;
+        }
+    }
+
     Board getBoard() {
         return board;
     }
 
-    public Piece getPieceToMove() {
+    Piece getPieceToMove() {
         return pieceToMove;
     }
 
-    public Alliance getPlayerToMove() {
+    Alliance getPlayerToMove() {
         return playerToMove;
     }
 
-    public Square getSrcSquare() {
+    Square getSrcSquare() {
         return srcSquare;
     }
 
     @Override
     public void handleSquareClicked(MouseEvent e, int rank, int file) {
 
+        Square destSquare;
         if (isLeftMouseButton(e)) {
 
             if (srcSquare == null) {
@@ -104,15 +126,22 @@ class BoardPanel extends JPanel implements SquareClickHandler {
             } else {
                 destSquare = board.getSquares()[rank][file];
 
-                if (MoveValidator.isValidMove(board, srcSquare, destSquare) && pieceToMove.getAlliance() == playerToMove) {
-                    srcSquare.setPiece(null);
-                    destSquare.setPiece(pieceToMove);
+                MoveValidation validation = MoveValidator.validateMove(board, srcSquare, destSquare);
+
+                if (validation.isValid() && pieceToMove.getAlliance() == playerToMove) {
+                    movePiece(srcSquare, destSquare);
+
+                    if (validation.isCastlingMove()){
+                        Square rookSquare = validation.getRookToCastleSquare();
+                        Square newRookSquare = getCastlingRookSquare(rookSquare);
+
+                        movePiece(rookSquare, Objects.requireNonNull(newRookSquare));
+                    }
 
                     nextTurn();
                 }
 
                 srcSquare = null;
-                destSquare = null;
                 pieceToMove = null;
             }
 
@@ -120,7 +149,6 @@ class BoardPanel extends JPanel implements SquareClickHandler {
 
         } else if (isRightMouseButton(e)) {
             srcSquare = null;
-            destSquare = null;
             pieceToMove = null;
 
             SwingUtilities.invokeLater(this::drawBoard);
