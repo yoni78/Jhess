@@ -19,14 +19,8 @@ public class Pawn extends Piece {
     @Override
     public List<Move> getMoveList() {
         List<Move> moveList = new ArrayList<>();
+        moveList.add(FORWARD);
 
-        // TODO: Use only forward, and reverse the sign somewhere else
-        if (alliance == Alliance.WHITE) {
-            moveList.add(FORWARD);
-
-        } else {
-            moveList.add(BACKWARD);
-        }
         return moveList;
     }
 }

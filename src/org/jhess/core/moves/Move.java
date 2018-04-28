@@ -25,7 +25,7 @@ public class Move {
     private final int rankToAdvance;
     private final int fileToAdvance;
 
-    private Move(int rankToAdvance, int fileToAdvance) {
+    public Move(int rankToAdvance, int fileToAdvance) {
         this.rankToAdvance = rankToAdvance;
         this.fileToAdvance = fileToAdvance;
     }

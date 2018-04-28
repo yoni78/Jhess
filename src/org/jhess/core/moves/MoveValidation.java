@@ -2,31 +2,54 @@ package org.jhess.core.moves;
 
 import org.jhess.core.board.Square;
 
+// TODO: 2018-04-28 Make class immutable, and create MoveValidationBuilder class
 public class MoveValidation {
 
-    private final boolean isValid;
-    private final boolean isCastlingMove;
-    private final Square rookToCastleSquare;
+    private boolean isValid = false;
 
-    MoveValidation(boolean isValid, boolean isCastlingMove, Square rookToCastleSquare) {
-        this.isValid = isValid;
-        this.isCastlingMove = isCastlingMove;
-        this.rookToCastleSquare = rookToCastleSquare;
-    }
+    private boolean isCastlingMove = false;
+    private Square rookToCastleSquare = null;
 
-    MoveValidation(boolean isValid) {
-        this(isValid, false, null);
-    }
+    private boolean isPromotionMove = false;
+    private Square promotionSquare = null;
 
     public boolean isValid() {
         return isValid;
     }
 
-    public boolean isCastlingMove() {
+    void setValid(boolean valid) {
+        isValid = valid;
+    }
+
+    boolean isCastlingMove() {
         return isCastlingMove;
     }
 
-    public Square getRookToCastleSquare() {
+    void setCastlingMove(boolean castlingMove) {
+        isCastlingMove = castlingMove;
+    }
+
+    Square getRookToCastleSquare() {
         return rookToCastleSquare;
+    }
+
+    void setRookToCastleSquare(Square rookToCastleSquare) {
+        this.rookToCastleSquare = rookToCastleSquare;
+    }
+
+    boolean isPromotionMove() {
+        return isPromotionMove;
+    }
+
+    void setPromotionMove(boolean promotionMove) {
+        isPromotionMove = promotionMove;
+    }
+
+    Square getPromotionSquare() {
+        return promotionSquare;
+    }
+
+    void setPromotionSquare(Square promotionSquare) {
+        this.promotionSquare = promotionSquare;
     }
 }
