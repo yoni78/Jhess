@@ -14,6 +14,7 @@ public class MoveValidator {
     // TODO: 2018-04-29 En-Passant
     // TODO: 2018-04-29 Promotion
     // TODO: 2018-04-29 Check, Mate
+
     /**
      * Determines if the given move is a legal one.
      *
@@ -24,7 +25,7 @@ public class MoveValidator {
      */
     public static MoveValidation validateMove(Board board, Square srcSquare, Square destSquare) {
 
-        MoveValidation validation = new MoveValidation();
+        MoveValidation validation = new MoveValidationBuilder().createMoveValidation();
         Piece piece = srcSquare.getPiece();
         Move move = new Move(srcSquare, destSquare);
 
@@ -54,21 +55,16 @@ public class MoveValidator {
      */
     private static MoveValidation validatePawnMove(Piece pawn, Move move, Square destSquare) {
 
-        MoveValidation validation = new MoveValidation();
-
-        // Reverse the move for black pawns
-//        if (pawn.getAlliance() == Alliance.BLACK){
-//            move = new Move(-move.getRankToAdvance(), move.getFileToAdvance());
-//        }
+        boolean isValid = false;
 
         if (isSpecialPawnMove(pawn, move, destSquare)) {
-            validation.setValid(true);
+            isValid = true;
 
         } else if (!destSquare.isOccupied()) {
-            validation.setValid(true);
+            isValid = true;
         }
 
-        return validation;
+        return new MoveValidationBuilder().setIsValid(isValid).createMoveValidation();
     }
 
     /**
@@ -79,10 +75,7 @@ public class MoveValidator {
      * @return A validation of the move.
      */
     private static MoveValidation validateRegularPieceMove(Piece piece, Move move) {
-        MoveValidation validation = new MoveValidation();
-        validation.setValid(piece.getMoveList().contains(move));
-
-        return validation;
+        return new MoveValidationBuilder().setIsValid(piece.getMoveList().contains(move)).createMoveValidation();
     }
 
     /**
@@ -96,7 +89,8 @@ public class MoveValidator {
      */
     private static MoveValidation validateKingMove(Board board, Piece king, Move move, Square destSquare) {
 
-        MoveValidation validation = new MoveValidation();
+        MoveValidationBuilder validationBuilder = new MoveValidationBuilder();
+        MoveValidation validation = validationBuilder.setIsValid(king.getMoveList().contains(move)).createMoveValidation();
 
         if (isCastlingMove(move)) {
             Square rookSquare = getCastlingRookSquare(board, destSquare, move);
@@ -107,13 +101,10 @@ public class MoveValidator {
                 king.setFirstMove(false);
                 rook.setFirstMove(false);
 
-                validation.setValid(true);
-                validation.setCastlingMove(true);
-                validation.setRookToCastleSquare(rookSquare);
+                validation = validationBuilder.setIsValid(true).setIsCastlingMove(true)
+                        .setRookToCastleSquare(rookSquare).createMoveValidation();
             }
 
-        } else {
-            validation.setValid(king.getMoveList().contains(move));
         }
 
         return validation;
