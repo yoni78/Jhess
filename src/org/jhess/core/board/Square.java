@@ -20,6 +20,10 @@ public class Square {
         this.piece = piece;
         this.rank = rank;
         this.file = file;
+
+        if (piece != null){
+            piece.setSquare(this);
+        }
     }
 
     public Piece getPiece() {

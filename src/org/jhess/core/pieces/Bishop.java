@@ -1,29 +1,36 @@
 package org.jhess.core.pieces;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.moves.Move;
+import org.jhess.core.board.Square;
+import org.jhess.core.moves.MoveVector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.core.moves.Move.*;
+import static org.jhess.core.moves.MoveVector.*;
 
 public class Bishop extends Piece {
+
+
+    public Bishop(Alliance alliance, Square square) {
+        super(alliance, square);
+    }
+
     public Bishop(Alliance alliance) {
         super(alliance);
     }
 
     @Override
-    public List<Move> getMoveList() {
-        Move[] baseMoves = {FORWARD_RIGHT, FORWARD_LEFT, BACKWARD_RIGHT, BACKWARD_LEFT};
-        List<Move> moveList = new ArrayList<>();
+    public List<MoveVector> getMoveList() {
+        MoveVector[] baseMoveVectors = {FORWARD_RIGHT, FORWARD_LEFT, BACKWARD_RIGHT, BACKWARD_LEFT};
+        List<MoveVector> moveVectorList = new ArrayList<>();
 
-        for(Move baseMove : baseMoves){
+        for(MoveVector baseMoveVector : baseMoveVectors){
             for (int i = 0; i < 8; i++) {
-                moveList.add(baseMove.extend(i));
+                moveVectorList.add(baseMoveVector.extend(i));
             }
         }
 
-        return moveList;
+        return moveVectorList;
     }
 }

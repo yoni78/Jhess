@@ -1,10 +1,12 @@
 package org.jhess.ui;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveValidation;
 import org.jhess.core.moves.MoveValidator;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
+import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
 
 import javax.swing.*;
@@ -20,10 +22,13 @@ import static javax.swing.SwingUtilities.isRightMouseButton;
 class BoardPanel extends JPanel implements SquareClickHandler {
 
     private final List<SquarePanel> squarePanels;
-    private Board board = new Board();
+    private final Board board = new Board();
+
     private Square srcSquare = null;
     private Piece pieceToMove;
     private Alliance playerToMove = Alliance.WHITE;
+
+    private List<GameMove> gameMoves = new ArrayList<>();
 
     private final Dimension SQUARE_PANEL_DIMENSION = new Dimension(10, 10);
 
@@ -72,13 +77,17 @@ class BoardPanel extends JPanel implements SquareClickHandler {
         }
     }
 
-    // TODO: 2018-04-27 Move to a different class
+    // TODO: 2018-04-27 MoveVector to a different class
     private void movePiece(Square srcSquare, Square destSquare){
-        destSquare.setPiece(srcSquare.getPiece());
+        Piece piece = srcSquare.getPiece();
+
+        destSquare.setPiece(piece);
         srcSquare.setPiece(null);
+
+        piece.setSquare(destSquare);
     }
 
-    // TODO: 2018-04-27 Move to a different class
+    // TODO: 2018-04-27 MoveVector to a different class
     private Square getCastlingRookSquare(Square rookSquare){
         if (rookSquare.getFile() == 0){
             return board.getSquares()[rookSquare.getRank()][3];
@@ -90,6 +99,15 @@ class BoardPanel extends JPanel implements SquareClickHandler {
             return null;
         }
     }
+
+    private GameMove getLastMove(List<GameMove> gameMoves){
+        if (gameMoves.size() > 0){
+            return gameMoves.get(gameMoves.size() - 1);
+        }
+
+        return null;
+    }
+
 
     Board getBoard() {
         return board;
@@ -124,7 +142,18 @@ class BoardPanel extends JPanel implements SquareClickHandler {
             } else {
                 destSquare = board.getSquares()[rank][file];
 
-                MoveValidation validation = MoveValidator.validateMove(board, srcSquare, destSquare);
+                GameMove lastMove = getLastMove(gameMoves);
+                MoveVector lastMoveVector = null;
+                Piece lastPlayedPiece = null;
+
+                if (lastMove != null) {
+                    lastMoveVector = new MoveVector(lastMove.getSrcSquare(), lastMove.getDestSquare());
+                    lastPlayedPiece = lastMove.getPlayedPiece();
+
+                }
+
+                MoveValidation validation = MoveValidator.validateMove(board, srcSquare, destSquare,
+                        lastPlayedPiece, lastMoveVector);
 
                 if (validation.isValid() && pieceToMove.getAlliance() == playerToMove) {
                     movePiece(srcSquare, destSquare);
@@ -134,8 +163,12 @@ class BoardPanel extends JPanel implements SquareClickHandler {
                         Square newRookSquare = getCastlingRookSquare(rookSquare);
 
                         movePiece(rookSquare, Objects.requireNonNull(newRookSquare));
+
+                    } else if (validation.isEnPassant()){
+                        validation.getCapturedPawn().getSquare().setPiece(null);
                     }
 
+                    gameMoves.add(new GameMove(pieceToMove, srcSquare, destSquare));
                     nextTurn();
                 }
 

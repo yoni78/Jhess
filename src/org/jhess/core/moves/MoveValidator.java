@@ -5,7 +5,7 @@ import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.*;
 
-import static org.jhess.core.moves.Move.*;
+import static org.jhess.core.moves.MoveVector.*;
 
 public class MoveValidator {
     private MoveValidator() {
@@ -23,22 +23,23 @@ public class MoveValidator {
      * @param destSquare The Destination square.
      * @return Whether the move is legal or not.
      */
-    public static MoveValidation validateMove(Board board, Square srcSquare, Square destSquare) {
+    public static MoveValidation validateMove(Board board, Square srcSquare, Square destSquare,
+                                              Piece lastMovedPiece, MoveVector lastMoveVector) {
 
         MoveValidation validation = new MoveValidationBuilder().createMoveValidation();
         Piece piece = srcSquare.getPiece();
-        Move move = new Move(srcSquare, destSquare);
+        MoveVector moveVector = new MoveVector(srcSquare, destSquare);
 
-        if (hasNoPieceInHisWay(board, piece, move, srcSquare) && canLandOnSquare(piece, destSquare)) {
+        if (hasNoPieceInHisWay(board, piece, moveVector, srcSquare) && canLandOnSquare(piece, destSquare)) {
 
             if (piece instanceof King) {
-                validation = validateKingMove(board, piece, move, destSquare);
+                validation = validateKingMove(board, piece, moveVector, destSquare);
 
             } else if (piece instanceof Pawn) {
-                validation = validatePawnMove(piece, move, destSquare);
+                validation = validatePawnMove(piece, moveVector, destSquare, lastMovedPiece, lastMoveVector);
 
             } else if (piece instanceof Queen || piece instanceof Rook || piece instanceof Bishop || piece instanceof Knight) {
-                validation = validateRegularPieceMove(piece, move);
+                validation = validateRegularPieceMove(piece, moveVector);
             }
         }
 
@@ -49,33 +50,131 @@ public class MoveValidator {
      * Validates pawn moves.
      *
      * @param pawn       The pawn to be played.
-     * @param move       The move to be played.
-     * @param destSquare The destination square of the move.
-     * @return A validation of the move.
+     * @param moveVector The moveVector to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @return A validation of the moveVector.
      */
-    private static MoveValidation validatePawnMove(Piece pawn, Move move, Square destSquare) {
+    private static MoveValidation validatePawnMove(Piece pawn, MoveVector moveVector, Square destSquare,
+                                                   Piece lastMovedPiece, MoveVector lastMoveVector) {
 
         boolean isValid = false;
+        boolean isPawnEnPassantMove = false;
+        Pawn capturedPawn = null;
 
-        if (isSpecialPawnMove(pawn, move, destSquare)) {
+        if (isPawnCaptureMove(pawn, moveVector, destSquare, false)) {
             isValid = true;
 
-        } else if (!destSquare.isOccupied()) {
+        } else if (isPawnDoubleMove(pawn, moveVector, false)) {
+            isValid = true;
+
+        } else if (isEnPassantMove(pawn, moveVector, destSquare, lastMovedPiece, lastMoveVector)) {
+            isValid = true;
+            isPawnEnPassantMove = true;
+            capturedPawn = (Pawn) lastMovedPiece;
+
+        } else if (isRegularPawnMove(pawn, moveVector, destSquare)) {
             isValid = true;
         }
 
-        return new MoveValidationBuilder().setIsValid(isValid).createMoveValidation();
+        return new MoveValidationBuilder().setIsValid(isValid)
+                .setIsEnPassant(isPawnEnPassantMove).setCapturedPawn(capturedPawn)
+                .createMoveValidation();
+    }
+
+    /**
+     * Check if the given moveVector is a regular pawn move.
+     *
+     * @param pawn       The pawn to be played.
+     * @param moveVector The moveVector to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @return If the moveVector is a regular pawn move.
+     */
+    private static boolean isRegularPawnMove(Piece pawn, MoveVector moveVector, Square destSquare){
+
+        if (destSquare.isOccupied()){
+            return false;
+        }
+
+        if (pawn.getAlliance() == Alliance.WHITE){
+            return moveVector.equals(FORWARD);
+
+        } else {
+            return moveVector.equals(BACKWARD);
+        }
+    }
+
+    /**
+     * Check if the given moveVector is an En Passant move.
+     *
+     * @param pawn       The pawn to be played.
+     * @param moveVector The moveVector to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @return If the moveVector is an En Passant.
+     */
+    private static boolean isEnPassantMove(Piece pawn, MoveVector moveVector, Square destSquare, Piece lastMovedPiece, MoveVector lastMoveVector) {
+
+        return lastMoveVector != null &&
+                lastMovedPiece instanceof Pawn && isPawnDoubleMove(lastMovedPiece, lastMoveVector, true)
+                && isPawnCaptureMove(pawn, moveVector, destSquare, true);
+
+    }
+
+    /**
+     * Check if the given moveVector is a pawn's capture moveVector.
+     *
+     * @param pawn       The pawn to be played.
+     * @param moveVector The moveVector to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @return If the moveVector is a pawn capture moveVector.
+     */
+    private static boolean isPawnCaptureMove(Piece pawn, MoveVector moveVector, Square destSquare, boolean checkEnPassant) {
+
+        if (checkEnPassant || destSquare.isOccupied()) {
+
+            if (pawn.getAlliance() == Alliance.WHITE && (moveVector.equals(FORWARD_RIGHT) || moveVector.equals(FORWARD_LEFT))) {
+                return true;
+            }
+
+            return pawn.getAlliance() == Alliance.BLACK && (moveVector.equals(BACKWARD_RIGHT) || moveVector.equals(BACKWARD_LEFT));
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if its a pawn double moveVector.
+     *
+     * @param pawn       The pawn to be played.
+     * @param moveVector The MoveVector to be played.
+     * @return if the moveVector is a pawn double moveVector.
+     */
+    private static boolean isPawnDoubleMove(Piece pawn, MoveVector moveVector, boolean forEnPassant) {
+
+        MoveVector possibleMoveVector;
+        if (pawn.getAlliance() == Alliance.WHITE) {
+            possibleMoveVector = FORWARD.extend(1);
+
+        } else {
+            possibleMoveVector = BACKWARD.extend(1);
+        }
+
+        if (forEnPassant || pawn.isFirstMove() && moveVector.equals(possibleMoveVector)) {
+            pawn.setFirstMove(false); // TODO: 2018-05-04 Not here?
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Validates regular pieces moves (queens, rooks, bishops and knights)
      *
-     * @param piece The piece to be played.
-     * @param move  The move to be played
-     * @return A validation of the move.
+     * @param piece      The piece to be played.
+     * @param moveVector The moveVector to be played
+     * @return A validation of the moveVector.
      */
-    private static MoveValidation validateRegularPieceMove(Piece piece, Move move) {
-        return new MoveValidationBuilder().setIsValid(piece.getMoveList().contains(move)).createMoveValidation();
+    private static MoveValidation validateRegularPieceMove(Piece piece, MoveVector moveVector) {
+        return new MoveValidationBuilder().setIsValid(piece.getMoveList().contains(moveVector)).createMoveValidation();
     }
 
     /**
@@ -83,17 +182,17 @@ public class MoveValidator {
      *
      * @param board      The game board.
      * @param king       The king to be played.
-     * @param move       The move to be played.
-     * @param destSquare The destination square of the move.
-     * @return A validation of the move.
+     * @param moveVector The moveVector to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @return A validation of the moveVector.
      */
-    private static MoveValidation validateKingMove(Board board, Piece king, Move move, Square destSquare) {
+    private static MoveValidation validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
 
         MoveValidationBuilder validationBuilder = new MoveValidationBuilder();
-        MoveValidation validation = validationBuilder.setIsValid(king.getMoveList().contains(move)).createMoveValidation();
+        MoveValidation validation = validationBuilder.setIsValid(king.getMoveList().contains(moveVector)).createMoveValidation();
 
-        if (isCastlingMove(move)) {
-            Square rookSquare = getCastlingRookSquare(board, destSquare, move);
+        if (isCastlingMove(moveVector)) {
+            Square rookSquare = getCastlingRookSquare(board, destSquare, moveVector);
             Piece rook = rookSquare.getPiece();
 
             if (king.isFirstMove() && rook != null && rook.isFirstMove()) {
@@ -108,47 +207,6 @@ public class MoveValidator {
         }
 
         return validation;
-    }
-
-    /**
-     * Checks special cases for pawn like captures or double moves at the start.
-     *
-     * @param piece      The piece to be played.
-     * @param move       The Move to be played.
-     * @param destSquare The destination square of the move.
-     * @return If there was a valid pawn capture or double move at the start.
-     */
-    private static boolean isSpecialPawnMove(Piece piece, Move move, Square destSquare) {
-
-        // TODO: Check for En-Passant
-
-        // If it's a capture move
-        if (destSquare.isOccupied()) {
-
-            if (piece.getAlliance() == Alliance.WHITE && (move.equals(FORWARD_RIGHT) || move.equals(FORWARD_LEFT))) {
-                return true;
-            }
-
-            if (piece.getAlliance() == Alliance.BLACK && (move.equals(BACKWARD_RIGHT) || move.equals(BACKWARD_LEFT))) {
-                return true;
-            }
-        }
-
-        // If it's the pawn's first move
-        Move possibleMove;
-        if (piece.getAlliance() == Alliance.WHITE) {
-            possibleMove = FORWARD.extend(1);
-
-        } else {
-            possibleMove = BACKWARD.extend(1);
-        }
-
-        if (piece.isFirstMove() && move.equals(possibleMove)) {
-            piece.setFirstMove(false);
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -167,20 +225,20 @@ public class MoveValidator {
      * Gets the rook that should participate in the castling.
      *
      * @param board      The game board.
-     * @param destSquare The destination square of the move.
-     * @param move       The move to be played.
+     * @param destSquare The destination square of the moveVector.
+     * @param moveVector The moveVector to be played.
      * @return The rook that should participate in the castling.
      */
-    private static Square getCastlingRookSquare(Board board, Square destSquare, Move move) {
+    private static Square getCastlingRookSquare(Board board, Square destSquare, MoveVector moveVector) {
 
         Square rookSquare = null;
 
         // Short
-        if (move.equals(RIGHT.extend(1))) {
+        if (moveVector.equals(RIGHT.extend(1))) {
             rookSquare = board.getSquares()[destSquare.getRank()][destSquare.getFile() + 1];
 
             // Long
-        } else if (move.equals(LEFT.extend(1))) {
+        } else if (moveVector.equals(LEFT.extend(1))) {
             rookSquare = board.getSquares()[destSquare.getRank()][destSquare.getFile() - 2];
         }
 
@@ -188,38 +246,38 @@ public class MoveValidator {
     }
 
     /**
-     * Checks if the move is a castling move.
+     * Checks if the moveVector is a castling moveVector.
      *
-     * @param move The move to check.
-     * @return If it's a castling move.
+     * @param moveVector The moveVector to check.
+     * @return If it's a castling moveVector.
      */
-    private static boolean isCastlingMove(Move move) {
-        return move.equals(LEFT.extend(1)) || move.equals(RIGHT.extend(1));
+    private static boolean isCastlingMove(MoveVector moveVector) {
+        return moveVector.equals(LEFT.extend(1)) || moveVector.equals(RIGHT.extend(1));
     }
 
     /**
-     * Checks if the piece attempts to jump over another piece in it's move.
+     * Checks if the piece attempts to jump over another piece in it's moveVector.
      *
-     * @param board     The game board;
-     * @param piece     The piece to be played.
-     * @param move      The Move to be played.
-     * @param srcSquare The source square of the move.
-     * @return If the path for the move is clear.
+     * @param board      The game board;
+     * @param piece      The piece to be played.
+     * @param moveVector The MoveVector to be played.
+     * @param srcSquare  The source square of the moveVector.
+     * @return If the path for the moveVector is clear.
      */
-    private static boolean hasNoPieceInHisWay(Board board, Piece piece, Move move, Square srcSquare) {
+    private static boolean hasNoPieceInHisWay(Board board, Piece piece, MoveVector moveVector, Square srcSquare) {
 
         // If the piece is skipping over another piece
         if (piece instanceof Knight) {
             return true;
         }
 
-        int distance = Math.max(Math.abs(move.getRankToAdvance()), Math.abs(move.getFileToAdvance()));
+        int distance = Math.max(Math.abs(moveVector.getRankToAdvance()), Math.abs(moveVector.getFileToAdvance()));
 
-        Move tempMove;
+        MoveVector tempMoveVector;
         Square tempSquare;
         for (int i = 1; i < distance; i++) {
-            tempMove = move.extend(-i);
-            tempSquare = board.addMoveToSquare(srcSquare, tempMove);
+            tempMoveVector = moveVector.extend(-i);
+            tempSquare = board.addMoveToSquare(srcSquare, tempMoveVector);
 
             if (tempSquare.isOccupied()) {
                 return false;

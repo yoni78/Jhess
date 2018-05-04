@@ -1,7 +1,7 @@
 package org.jhess.core.board;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.moves.Move;
+import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.*;
 
 import java.util.ArrayList;
@@ -82,9 +82,9 @@ public class Board {
         }
     }
 
-    public Square addMoveToSquare(Square square, Move move){
-        int rank = square.getRank() + move.getRankToAdvance();
-        int file = square.getFile() + move.getFileToAdvance();
+    public Square addMoveToSquare(Square square, MoveVector moveVector){
+        int rank = square.getRank() + moveVector.getRankToAdvance();
+        int file = square.getFile() + moveVector.getFileToAdvance();
 
         return squares[rank][file];
     }

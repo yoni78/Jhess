@@ -32,7 +32,7 @@ class SquarePanel extends JPanel {
         validate();
     }
 
-    // TODO: Move both assign methods to BoardPanel
+    // TODO: MoveVector both assign methods to BoardPanel
 
     private void addMouseControls() {
         addMouseListener(new MouseListener() {
