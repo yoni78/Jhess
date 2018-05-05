@@ -11,7 +11,6 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    // TODO: 2018-04-29 En-Passant
     // TODO: 2018-04-29 Promotion
     // TODO: 2018-04-29 Check, Mate
 
@@ -58,8 +57,12 @@ public class MoveValidator {
                                                    Piece lastMovedPiece, MoveVector lastMoveVector) {
 
         boolean isValid = false;
+
         boolean isPawnEnPassantMove = false;
         Pawn capturedPawn = null;
+
+        boolean isPromotionMove = false;
+        Square promotionSquare = null;
 
         if (isPawnCaptureMove(pawn, moveVector, destSquare, false)) {
             isValid = true;
@@ -74,10 +77,17 @@ public class MoveValidator {
 
         } else if (isRegularPawnMove(pawn, moveVector, destSquare)) {
             isValid = true;
+            pawn.setFirstMove(false);
+        }
+
+        if (isPawnOnLastRank(destSquare, pawn.getAlliance())){
+            isPromotionMove = true;
+            promotionSquare = destSquare;
         }
 
         return new MoveValidationBuilder().setIsValid(isValid)
                 .setIsEnPassant(isPawnEnPassantMove).setCapturedPawn(capturedPawn)
+                .setIsPromotionMove(isPromotionMove).setPromotionSquare(promotionSquare)
                 .createMoveValidation();
     }
 
@@ -89,13 +99,13 @@ public class MoveValidator {
      * @param destSquare The destination square of the moveVector.
      * @return If the moveVector is a regular pawn move.
      */
-    private static boolean isRegularPawnMove(Piece pawn, MoveVector moveVector, Square destSquare){
+    private static boolean isRegularPawnMove(Piece pawn, MoveVector moveVector, Square destSquare) {
 
-        if (destSquare.isOccupied()){
+        if (destSquare.isOccupied()) {
             return false;
         }
 
-        if (pawn.getAlliance() == Alliance.WHITE){
+        if (pawn.getAlliance() == Alliance.WHITE) {
             return moveVector.equals(FORWARD);
 
         } else {
@@ -167,6 +177,18 @@ public class MoveValidator {
     }
 
     /**
+     * Checks if the pawn got to the last rank (and should subsequently be promoted)
+     *
+     * @param destSquare   The destination square of the move.
+     * @param pawnAlliance The alliance of the pawn.
+     * @return If the pawn got to the last rank.
+     */
+    private static boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
+        return (pawnAlliance == Alliance.WHITE && destSquare.getRank() == 7) ||
+                (pawnAlliance == Alliance.BLACK && destSquare.getRank() == 0);
+    }
+
+    /**
      * Validates regular pieces moves (queens, rooks, bishops and knights)
      *
      * @param piece      The piece to be played.
@@ -207,18 +229,6 @@ public class MoveValidator {
         }
 
         return validation;
-    }
-
-    /**
-     * Checks if the pawn got to the last rank (and should subsequently be promoted)
-     *
-     * @param destSquare   The destination square of the move.
-     * @param pawnAlliance The alliance of the pawn.
-     * @return If the pawn got to the last rank.
-     */
-    private static boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
-        return (pawnAlliance == Alliance.WHITE && destSquare.getRank() == 7) ||
-                (pawnAlliance == Alliance.BLACK && destSquare.getRank() == 0);
     }
 
     /**

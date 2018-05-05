@@ -9,7 +9,7 @@ public class MoveValidation {
     private final boolean isValid;
 
     private final boolean isCastlingMove;
-    private final Square rookToCastleSquare;
+    private final Square rookToCastleSquare; // TODO: 2018-05-05 Change to the actual rook
 
     private final boolean isPromotionMove;
     private final Square promotionSquare;

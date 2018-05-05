@@ -1,13 +1,14 @@
 package org.jhess.ui;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.board.Board;
+import org.jhess.core.board.Square;
 import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveValidation;
 import org.jhess.core.moves.MoveValidator;
-import org.jhess.core.board.Board;
-import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
+import org.jhess.core.pieces.Queen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -166,6 +167,13 @@ class BoardPanel extends JPanel implements SquareClickHandler {
 
                     } else if (validation.isEnPassant()){
                         validation.getCapturedPawn().getSquare().setPiece(null);
+                    }
+
+                    if (validation.isPromotionMove()){
+                        Alliance pawnToPromoteAlliance = validation.getPromotionSquare().getPiece().getAlliance();
+                        Piece newPiece = new Queen(pawnToPromoteAlliance, validation.getPromotionSquare()); // TODO: 2018-05-05 Should be selected by the user
+
+                        validation.getPromotionSquare().setPiece(newPiece);
                     }
 
                     gameMoves.add(new GameMove(pieceToMove, srcSquare, destSquare));
