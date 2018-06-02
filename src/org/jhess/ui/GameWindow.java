@@ -3,13 +3,13 @@ package org.jhess.ui;
 import javax.swing.*;
 import java.awt.*;
 
-class GameWindow extends JFrame {
-
-    private BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
+public class GameWindow extends JFrame {
 
     private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 400);
 
-    GameWindow() {
+    private BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
+
+    public GameWindow() {
         setTitle("Jhess");
 
         setLayout(new BorderLayout());
@@ -35,5 +35,9 @@ class GameWindow extends JFrame {
 
     private void initPanel() {
         add(boardPanel, BorderLayout.CENTER);
+    }
+
+    BoardPanel getBoardPanel() {
+        return boardPanel;
     }
 }

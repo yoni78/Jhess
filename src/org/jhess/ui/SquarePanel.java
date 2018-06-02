@@ -6,23 +6,28 @@ import org.jhess.core.pieces.Piece;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Represents a square in the UI.
+ */
 class SquarePanel extends JPanel {
 
     private final Square square;
-    private BoardPanel boardPanel;
+    private final List<SquareClickedListener> listenerList = new ArrayList<>();
 
-    SquarePanel(BoardPanel boardPanel, Square square, Dimension dimension) {
+    public SquarePanel(BoardPanel boardPanel, Square square, Dimension dimension) {
         super(new GridBagLayout());
 
         this.square = square;
-        this.boardPanel = boardPanel;
 
         setPreferredSize(dimension);
         addMouseControls();
@@ -32,13 +37,18 @@ class SquarePanel extends JPanel {
         validate();
     }
 
-    // TODO: MoveVector both assign methods to BoardPanel
+    private synchronized void fireSquareClickedEvent(MouseEvent mouseEvent){
+        SquareClickedEvent event = new SquareClickedEvent(this, mouseEvent, square.getRank(), square.getFile());
+        for (SquareClickedListener listener : listenerList){
+            listener.handleSquareClicked(event);
+        }
+    }
 
     private void addMouseControls() {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                boardPanel.handleSquareClicked(e, square.getRank(), square.getFile());
+                fireSquareClickedEvent(e);
             }
 
             @Override
@@ -94,27 +104,31 @@ class SquarePanel extends JPanel {
         }
     }
 
-    private void highLightBorder() {
-
-        Piece pieceToMove = boardPanel.getPieceToMove();
-
-        if (pieceToMove != null &&
-                pieceToMove.getAlliance() == boardPanel.getPlayerToMove() &&
-                boardPanel.getSrcSquare() == square) {
-
-            setBorder(BorderFactory.createLineBorder(Color.cyan));
-
-        } else {
-            setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        }
+    public Square getSquare() {
+        return square;
     }
 
-    void drawSquare() {
+    public void highLightBorder() {
+        setBorder(BorderFactory.createLineBorder(Color.cyan));
+    }
+
+    public void removeHighLight(){
+        setBorder(BorderFactory.createLineBorder(Color.GRAY));
+    }
+
+    public void drawSquare() {
         assignSquareColor();
         assignSquarePieceIcon();
-        highLightBorder();
 
         validate();
         repaint();
+    }
+
+    public synchronized void addSquareClickedListener(SquareClickedListener l){
+        listenerList.add(l);
+    }
+
+    public synchronized void removeSquareClickedListener(SquareClickedListener l){
+        listenerList.remove(l);
     }
 }

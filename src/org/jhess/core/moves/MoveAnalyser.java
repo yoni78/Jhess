@@ -7,11 +7,10 @@ import org.jhess.core.pieces.*;
 
 import static org.jhess.core.moves.MoveVector.*;
 
-public class MoveValidator {
-    private MoveValidator() {
+public class MoveAnalyser {
+    private MoveAnalyser() {
     }
 
-    // TODO: 2018-04-29 Promotion
     // TODO: 2018-04-29 Check, Mate
 
     /**
@@ -22,27 +21,32 @@ public class MoveValidator {
      * @param destSquare The Destination square.
      * @return Whether the move is legal or not.
      */
-    public static MoveValidation validateMove(Board board, Square srcSquare, Square destSquare,
-                                              Piece lastMovedPiece, MoveVector lastMoveVector) {
+    public static MoveAnalysis analyseMove(Board board, Square srcSquare, Square destSquare,
+                                           Piece lastMovedPiece, MoveVector lastMoveVector) {
 
-        MoveValidation validation = new MoveValidationBuilder().createMoveValidation();
+        MoveAnalysisBuilder validationBuilder = new MoveAnalysisBuilder();
         Piece piece = srcSquare.getPiece();
         MoveVector moveVector = new MoveVector(srcSquare, destSquare);
 
         if (hasNoPieceInHisWay(board, piece, moveVector, srcSquare) && canLandOnSquare(piece, destSquare)) {
 
             if (piece instanceof King) {
-                validation = validateKingMove(board, piece, moveVector, destSquare);
+                validationBuilder = validateKingMove(board, piece, moveVector, destSquare);
 
             } else if (piece instanceof Pawn) {
-                validation = validatePawnMove(piece, moveVector, destSquare, lastMovedPiece, lastMoveVector);
+                validationBuilder = validatePawnMove(piece, moveVector, destSquare, lastMovedPiece, lastMoveVector);
 
             } else if (piece instanceof Queen || piece instanceof Rook || piece instanceof Bishop || piece instanceof Knight) {
-                validation = validateRegularPieceMove(piece, moveVector);
+                validationBuilder = validateRegularPieceMove(piece, moveVector);
             }
         }
 
-        return validation;
+        // TODO: 2018-05-11 Check from castling
+        if (isCheck(board, piece)){
+            validationBuilder.setIsCheck(true);
+        }
+
+        return validationBuilder.createMoveValidation();
     }
 
     /**
@@ -53,8 +57,8 @@ public class MoveValidator {
      * @param destSquare The destination square of the moveVector.
      * @return A validation of the moveVector.
      */
-    private static MoveValidation validatePawnMove(Piece pawn, MoveVector moveVector, Square destSquare,
-                                                   Piece lastMovedPiece, MoveVector lastMoveVector) {
+    private static MoveAnalysisBuilder validatePawnMove(Piece pawn, MoveVector moveVector, Square destSquare,
+                                                        Piece lastMovedPiece, MoveVector lastMoveVector) {
 
         boolean isValid = false;
 
@@ -80,15 +84,14 @@ public class MoveValidator {
             pawn.setFirstMove(false);
         }
 
-        if (isPawnOnLastRank(destSquare, pawn.getAlliance())){
+        if (isPawnOnLastRank(destSquare, pawn.getAlliance())) {
             isPromotionMove = true;
             promotionSquare = destSquare;
         }
 
-        return new MoveValidationBuilder().setIsValid(isValid)
+        return new MoveAnalysisBuilder().setIsValid(isValid)
                 .setIsEnPassant(isPawnEnPassantMove).setCapturedPawn(capturedPawn)
-                .setIsPromotionMove(isPromotionMove).setPromotionSquare(promotionSquare)
-                .createMoveValidation();
+                .setIsPromotionMove(isPromotionMove).setPromotionSquare(promotionSquare);
     }
 
     /**
@@ -195,8 +198,8 @@ public class MoveValidator {
      * @param moveVector The moveVector to be played
      * @return A validation of the moveVector.
      */
-    private static MoveValidation validateRegularPieceMove(Piece piece, MoveVector moveVector) {
-        return new MoveValidationBuilder().setIsValid(piece.getMoveList().contains(moveVector)).createMoveValidation();
+    private static MoveAnalysisBuilder validateRegularPieceMove(Piece piece, MoveVector moveVector) {
+        return new MoveAnalysisBuilder().setIsValid(piece.getMoveList().contains(moveVector));
     }
 
     /**
@@ -208,10 +211,10 @@ public class MoveValidator {
      * @param destSquare The destination square of the moveVector.
      * @return A validation of the moveVector.
      */
-    private static MoveValidation validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
+    private static MoveAnalysisBuilder validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
 
-        MoveValidationBuilder validationBuilder = new MoveValidationBuilder();
-        MoveValidation validation = validationBuilder.setIsValid(king.getMoveList().contains(moveVector)).createMoveValidation();
+        MoveAnalysisBuilder validationBuilder = new MoveAnalysisBuilder();
+        validationBuilder.setIsValid(king.getMoveList().contains(moveVector));
 
         if (isCastlingMove(moveVector)) {
             Square rookSquare = getCastlingRookSquare(board, destSquare, moveVector);
@@ -222,13 +225,11 @@ public class MoveValidator {
                 king.setFirstMove(false);
                 rook.setFirstMove(false);
 
-                validation = validationBuilder.setIsValid(true).setIsCastlingMove(true)
-                        .setRookToCastleSquare(rookSquare).createMoveValidation();
+                validationBuilder.setIsValid(true).setIsCastlingMove(true).setRookToCastleSquare(rookSquare);
             }
-
         }
 
-        return validation;
+        return validationBuilder;
     }
 
     /**
@@ -306,5 +307,33 @@ public class MoveValidator {
      */
     private static boolean canLandOnSquare(Piece piece, Square destSquare) {
         return !destSquare.isOccupied() || destSquare.getPiece().getAlliance() != piece.getAlliance();
+    }
+
+    // FIXME: 2018-05-17 More complicated checks (discovered check, etc...)
+    private static boolean isCheck(Board board, Piece pieceToPlay) {
+
+        Square destSquare;
+        Piece destPiece;
+
+        for (MoveVector move : pieceToPlay.getMoveList()) {
+
+            destSquare = board.addMoveToSquare(pieceToPlay.getSquare(), move);
+
+            // If the move is outside the board
+            if (destSquare == null){
+                continue;
+            }
+
+            destPiece = destSquare.getPiece();
+
+            boolean isKing = destPiece instanceof King;
+            boolean isOfOppositeColor = destPiece != null && (pieceToPlay.getAlliance() == destPiece.getAlliance());
+
+            if (isKing && isOfOppositeColor){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

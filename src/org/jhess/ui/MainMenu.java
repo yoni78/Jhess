@@ -1,5 +1,7 @@
 package org.jhess.ui;
 
+import org.jhess.core.board.Board;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -44,8 +46,12 @@ class MainMenu extends JFrame {
         add(panel);
     }
 
-    private void bNewGameClicked(ActionEvent e){
-        new GameWindow().setVisible(true);
+    private void bNewGameClicked(ActionEvent e) {
+        Board board = new Board();
+        GameWindow gameWindow = new GameWindow();
+        GameController gameController = new GameController(board, gameWindow);
+
+        gameWindow.setVisible(true);
     }
 
     private void bExitClicked(ActionEvent e){

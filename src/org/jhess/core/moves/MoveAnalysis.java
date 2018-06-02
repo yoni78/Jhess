@@ -4,7 +4,7 @@ import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
 
 
-public class MoveValidation {
+public class MoveAnalysis {
 
     private final boolean isValid;
 
@@ -17,10 +17,14 @@ public class MoveValidation {
     private final boolean isEnPassant;
     private final Piece capturedPawn;
 
-    MoveValidation(boolean isValid,
-                   boolean isCastlingMove, Square rookToCastleSquare,
-                   boolean isPromotionMove, Square promotionSquare,
-                   boolean isEnPassant, Piece capturedPawn) {
+    private final boolean isCheck;
+
+    MoveAnalysis(boolean isValid,
+                 boolean isCastlingMove, Square rookToCastleSquare,
+                 boolean isPromotionMove, Square promotionSquare,
+                 boolean isEnPassant, Piece capturedPawn,
+                 boolean isCheck) {
+
         this.isValid = isValid;
         this.isCastlingMove = isCastlingMove;
         this.rookToCastleSquare = rookToCastleSquare;
@@ -28,6 +32,7 @@ public class MoveValidation {
         this.promotionSquare = promotionSquare;
         this.isEnPassant = isEnPassant;
         this.capturedPawn = capturedPawn;
+        this.isCheck = isCheck;
     }
 
     public boolean isValid() {
@@ -56,5 +61,9 @@ public class MoveValidation {
 
     public Piece getCapturedPawn() {
         return capturedPawn;
+    }
+
+    public boolean isCheck() {
+        return isCheck;
     }
 }

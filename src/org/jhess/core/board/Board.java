@@ -86,6 +86,10 @@ public class Board {
         int rank = square.getRank() + moveVector.getRankToAdvance();
         int file = square.getFile() + moveVector.getFileToAdvance();
 
+        if (rank < 0 || rank > 7 || file < 0 || file > 7){
+            return null; // TODO: 2018-05-17 throw an exception?
+        }
+
         return squares[rank][file];
     }
 
