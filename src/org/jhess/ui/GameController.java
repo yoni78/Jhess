@@ -3,16 +3,17 @@ package org.jhess.ui;
 import com.google.common.collect.Iterables;
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
-import org.jhess.core.board.BoardUtils;
 import org.jhess.core.board.Square;
-import org.jhess.core.moves.*;
+import org.jhess.core.moves.GameMove;
+import org.jhess.core.moves.MoveAnalyser;
+import org.jhess.core.moves.MoveAnalysis;
+import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
-import org.jhess.core.pieces.Queen;
+import org.jhess.logics.GameLogics;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.jhess.core.moves.MoveUtils.movePiece;
 
@@ -154,48 +155,15 @@ public class GameController {
      */
     private void handleSpecialMoves(MoveAnalysis moveAnalysis) {
         if (moveAnalysis.isCastlingMove()) {
-            handleCastlingMove(moveAnalysis);
+            GameLogics.castlingMove(board, moveAnalysis);
 
         } else if (moveAnalysis.isEnPassant()) {
-            handleEnPassant(moveAnalysis);
+            GameLogics.enPassantMove(moveAnalysis);
         }
 
         if (moveAnalysis.isPromotionMove()) {
-            handlePromotion(moveAnalysis);
+            GameLogics.promotionMove(moveAnalysis);
         }
-    }
-
-    /**
-     * Performs the necessary actions for a promotion move.
-     *
-     * @param moveAnalysis The analysis of the move.
-     */
-    private void handlePromotion(MoveAnalysis moveAnalysis) {
-        Alliance pawnToPromoteAlliance = moveAnalysis.getPromotionSquare().getPiece().getAlliance();
-        Piece newPiece = new Queen(pawnToPromoteAlliance, moveAnalysis.getPromotionSquare()); // TODO: 2018-05-05 Should be selected by the user
-
-        moveAnalysis.getPromotionSquare().setPiece(newPiece);
-    }
-
-    /**
-     * Performs the necessary actions for an en passant move.
-     *
-     * @param moveAnalysis The analysis of the move.
-     */
-    private void handleEnPassant(MoveAnalysis moveAnalysis) {
-        moveAnalysis.getCapturedPawn().getSquare().setPiece(null);
-    }
-
-    /**
-     * Performs the necessary actions for a castling move.
-     *
-     * @param moveAnalysis The analysis of the move.
-     */
-    private void handleCastlingMove(MoveAnalysis moveAnalysis) {
-        Square rookSquare = moveAnalysis.getRookToCastleSquare();
-        Square newRookSquare = BoardUtils.getCastlingRookSquare(board, rookSquare);
-
-        movePiece(rookSquare, Objects.requireNonNull(newRookSquare));
     }
 
 
