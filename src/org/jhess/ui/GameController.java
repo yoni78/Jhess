@@ -9,13 +9,13 @@ import org.jhess.core.moves.MoveAnalyser;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
-import org.jhess.logics.GameLogics;
+import org.jhess.logics.moves.MovesLogic;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.core.moves.MoveUtils.movePiece;
+import static org.jhess.logics.moves.MoveUtils.movePiece;
 
 // TODO: 2018-05-21 Add a different class to handle the manage the game flow?
 public class GameController {
@@ -155,14 +155,14 @@ public class GameController {
      */
     private void handleSpecialMoves(MoveAnalysis moveAnalysis) {
         if (moveAnalysis.isCastlingMove()) {
-            GameLogics.castlingMove(board, moveAnalysis);
+            MovesLogic.castlingMove(board, moveAnalysis);
 
         } else if (moveAnalysis.isEnPassant()) {
-            GameLogics.enPassantMove(moveAnalysis);
+            MovesLogic.enPassantMove(moveAnalysis);
         }
 
         if (moveAnalysis.isPromotionMove()) {
-            GameLogics.promotionMove(moveAnalysis);
+            MovesLogic.promotionMove(moveAnalysis);
         }
     }
 

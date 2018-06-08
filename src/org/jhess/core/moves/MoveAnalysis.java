@@ -19,7 +19,7 @@ public class MoveAnalysis {
 
     private final boolean isCheck;
 
-    MoveAnalysis(boolean isValid,
+    public MoveAnalysis(boolean isValid,
                  boolean isCastlingMove, Square rookToCastleSquare,
                  boolean isPromotionMove, Square promotionSquare,
                  boolean isEnPassant, Piece capturedPawn,

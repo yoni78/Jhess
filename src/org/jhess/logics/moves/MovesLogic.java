@@ -1,8 +1,8 @@
-package org.jhess.logics;
+package org.jhess.logics.moves;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
-import org.jhess.core.board.BoardUtils;
+import org.jhess.logics.Board.BoardUtils;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
@@ -10,11 +10,11 @@ import org.jhess.core.pieces.Queen;
 
 import java.util.Objects;
 
-import static org.jhess.core.moves.MoveUtils.movePiece;
+import static org.jhess.logics.moves.MoveUtils.movePiece;
 
-public final class GameLogics {
+public final class MovesLogic {
 
-    private GameLogics() {
+    private MovesLogic() {
     }
     /**
      * Performs the necessary actions for a castling move.

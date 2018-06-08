@@ -1,4 +1,7 @@
-package org.jhess.core.board;
+package org.jhess.logics.Board;
+
+import org.jhess.core.board.Board;
+import org.jhess.core.board.Square;
 
 public final class BoardUtils {
 

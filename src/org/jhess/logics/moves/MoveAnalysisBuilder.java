@@ -1,6 +1,7 @@
-package org.jhess.core.moves;
+package org.jhess.logics.moves;
 
 import org.jhess.core.board.Square;
+import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 
 public class MoveAnalysisBuilder {
@@ -54,7 +55,7 @@ public class MoveAnalysisBuilder {
         return this;
     }
 
-    MoveAnalysis createMoveValidation() {
+    public MoveAnalysis createMoveValidation() {
         return new MoveAnalysis(isValid, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, capturedPawn, isCheck);
     }
 }
