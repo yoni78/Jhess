@@ -2,15 +2,13 @@ package org.jhess.logics.moves;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
-import org.jhess.logics.Board.BoardUtils;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.Queen;
+import org.jhess.logics.Board.BoardUtils;
 
 import java.util.Objects;
-
-import static org.jhess.logics.moves.MoveUtils.movePiece;
 
 public final class MovesLogic {
 
@@ -22,11 +20,11 @@ public final class MovesLogic {
      * @param moveAnalysis The analysis of the move.
      * @param board The game board.
      */
-    public static void castlingMove(Board board, MoveAnalysis moveAnalysis){
+    public static Board castlingMove(Board board, MoveAnalysis moveAnalysis){
         Square rookSquare = moveAnalysis.getRookToCastleSquare();
         Square newRookSquare = BoardUtils.getCastlingRookSquare(board, rookSquare);
 
-        movePiece(rookSquare, Objects.requireNonNull(newRookSquare));
+        return MoveUtils.movePiece(board, rookSquare, Objects.requireNonNull(newRookSquare));
     }
 
     /**
@@ -34,8 +32,14 @@ public final class MovesLogic {
      *
      * @param moveAnalysis The analysis of the move.
      */
-    public static void enPassantMove(MoveAnalysis moveAnalysis) {
-        moveAnalysis.getCapturedPawn().getSquare().setPiece(null);
+    public static Board enPassantMove(Board board, MoveAnalysis moveAnalysis) {
+        Board newBoard = new Board(board);
+        Square capturePawnSquare = moveAnalysis.getCapturedPawn().getSquare();
+        Square newSquare = newBoard.getSquares()[capturePawnSquare.getRank()][capturePawnSquare.getFile()];
+
+        newSquare.setPiece(null);
+
+        return newBoard;
     }
 
     /**
@@ -43,11 +47,18 @@ public final class MovesLogic {
      *
      * @param moveAnalysis The analysis of the move.
      */
-    public static void promotionMove(MoveAnalysis moveAnalysis) {
+    public static Board promotionMove(Board board, MoveAnalysis moveAnalysis) {
         Alliance pawnToPromoteAlliance = moveAnalysis.getPromotionSquare().getPiece().getAlliance();
         Piece newPiece = new Queen(pawnToPromoteAlliance, moveAnalysis.getPromotionSquare()); // TODO: 2018-05-05 Should be selected by the user
 
-        moveAnalysis.getPromotionSquare().setPiece(newPiece);
+        Board newBoard = new Board(board);
+        Square promotionSquare = moveAnalysis.getPromotionSquare();
+        Square newSquare = newBoard.getSquares()[promotionSquare.getRank()][promotionSquare.getFile()];
+
+
+        newSquare.setPiece(newPiece);
+
+        return newBoard;
     }
 
 }

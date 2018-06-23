@@ -34,4 +34,9 @@ public class King extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new King(alliance, square);
+    }
 }

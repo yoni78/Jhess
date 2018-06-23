@@ -33,4 +33,9 @@ public class Rook extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new Rook(alliance ,square);
+    }
 }

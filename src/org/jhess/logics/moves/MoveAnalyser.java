@@ -1,10 +1,16 @@
-package org.jhess.core.moves;
+package org.jhess.logics.moves;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
+import org.jhess.core.moves.MoveAnalysis;
+import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.*;
-import org.jhess.logics.moves.MoveAnalysisBuilder;
+import org.jhess.core.moves.MoveAnalysisBuilder;
+import org.jhess.logics.Board.BoardUtils;
+import org.jhess.logics.pieces.PieceUtils;
+
+import java.util.List;
 
 import static org.jhess.core.moves.MoveVector.*;
 
@@ -42,9 +48,16 @@ public class MoveAnalyser {
             }
         }
 
-        // TODO: 2018-05-11 Check from castling
-        if (isCheck(board, piece)){
+        // TODO: 2018-05-11 Player should get out of check
+        // TODO: 2018-06-16 Check for check at the beginning of the turn, before the player makes a move.
+        if (isCheck(board, piece.getAlliance())) {
             validationBuilder.setIsCheck(true);
+
+            Board newBoard = MoveUtils.movePiece(board, srcSquare, destSquare);
+
+            if (isCheck(newBoard, piece.getAlliance())){
+                validationBuilder.setIsLegal(false);
+            }
         }
 
         return validationBuilder.createMoveValidation();
@@ -90,7 +103,7 @@ public class MoveAnalyser {
             promotionSquare = destSquare;
         }
 
-        return new MoveAnalysisBuilder().setIsValid(isValid)
+        return new MoveAnalysisBuilder().setIsLegal(isValid)
                 .setIsEnPassant(isPawnEnPassantMove).setCapturedPawn(capturedPawn)
                 .setIsPromotionMove(isPromotionMove).setPromotionSquare(promotionSquare);
     }
@@ -200,7 +213,7 @@ public class MoveAnalyser {
      * @return A validation of the moveVector.
      */
     private static MoveAnalysisBuilder validateRegularPieceMove(Piece piece, MoveVector moveVector) {
-        return new MoveAnalysisBuilder().setIsValid(piece.getMoveList().contains(moveVector));
+        return new MoveAnalysisBuilder().setIsLegal(piece.getMoveList().contains(moveVector));
     }
 
     /**
@@ -215,7 +228,7 @@ public class MoveAnalyser {
     private static MoveAnalysisBuilder validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
 
         MoveAnalysisBuilder validationBuilder = new MoveAnalysisBuilder();
-        validationBuilder.setIsValid(king.getMoveList().contains(moveVector));
+        validationBuilder.setIsLegal(king.getMoveList().contains(moveVector));
 
         if (isCastlingMove(moveVector)) {
             Square rookSquare = getCastlingRookSquare(board, destSquare, moveVector);
@@ -226,7 +239,7 @@ public class MoveAnalyser {
                 king.setFirstMove(false);
                 rook.setFirstMove(false);
 
-                validationBuilder.setIsValid(true).setIsCastlingMove(true).setRookToCastleSquare(rookSquare);
+                validationBuilder.setIsLegal(true).setIsCastlingMove(true).setRookToCastleSquare(rookSquare);
             }
         }
 
@@ -289,7 +302,11 @@ public class MoveAnalyser {
         Square tempSquare;
         for (int i = 1; i < distance; i++) {
             tempMoveVector = moveVector.extend(-i);
-            tempSquare = board.addMoveToSquare(srcSquare, tempMoveVector);
+            tempSquare = BoardUtils.addMoveToSquare(board, srcSquare, tempMoveVector);
+
+            if (tempSquare == null) {
+                return true;
+            }
 
             if (tempSquare.isOccupied()) {
                 return false;
@@ -310,27 +327,33 @@ public class MoveAnalyser {
         return !destSquare.isOccupied() || destSquare.getPiece().getAlliance() != piece.getAlliance();
     }
 
-    // FIXME: 2018-05-17 More complicated checks (discovered check, etc...)
-    private static boolean isCheck(Board board, Piece pieceToPlay) {
+    private static boolean isCheck(Board board, Alliance playerAlliance) {
 
-        Square destSquare;
-        Piece destPiece;
+        King king = BoardUtils.getKing(board, playerAlliance);
 
-        for (MoveVector move : pieceToPlay.getMoveList()) {
+        List<MoveVector> possibleMoves = PieceUtils.getRookMoves();
+        possibleMoves.addAll(PieceUtils.getBishopMoves());
+        possibleMoves.addAll(PieceUtils.getKnightMoves());
 
-            destSquare = board.addMoveToSquare(pieceToPlay.getSquare(), move);
+        for (MoveVector possibleMove : possibleMoves) {
+            Square destSquare = BoardUtils.addMoveToSquare(board, king.getSquare(), possibleMove);
 
-            // If the move is outside the board
-            if (destSquare == null){
+            if (destSquare == null || destSquare.getPiece() == null || destSquare.getPiece().getAlliance() == playerAlliance) {
                 continue;
             }
 
-            destPiece = destSquare.getPiece();
+            Piece otherPiece = destSquare.getPiece();
+            if (otherPiece == null) {
+                continue;
+            }
 
-            boolean isKing = destPiece instanceof King;
-            boolean isOfOppositeColor = destPiece != null && (pieceToPlay.getAlliance() == destPiece.getAlliance());
+            boolean isRookOrQueenCheck = (otherPiece instanceof Rook || otherPiece instanceof Queen) && MoveUtils.isRookMove(possibleMove);
+            boolean isBishopOrQueenCheck = (otherPiece instanceof Bishop || otherPiece instanceof Queen) && MoveUtils.isBishopMove(possibleMove);
+            boolean isKnightCheck = otherPiece instanceof Knight && MoveUtils.isKnightMove(possibleMove);
+            boolean isPawnCheck = otherPiece instanceof Pawn && MoveUtils.isPawnMove(possibleMove);
 
-            if (isKing && isOfOppositeColor){
+            if (hasNoPieceInHisWay(board, king, possibleMove, king.getSquare()) &&
+                    (isRookOrQueenCheck || isBishopOrQueenCheck || isKnightCheck || isPawnCheck)) {
                 return true;
             }
         }

@@ -34,4 +34,9 @@ public class Queen extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new Queen(alliance, square);
+    }
 }

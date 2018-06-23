@@ -26,6 +26,16 @@ public class Square {
         }
     }
 
+    public Square(Square square) {
+        rank = square.getRank();
+        file = square.getFile();
+        piece = square.getPiece() != null ? square.getPiece().getCopy() : null;
+
+        if (piece != null) {
+            piece.setSquare(this);
+        }
+    }
+
     public Piece getPiece() {
         return piece;
     }

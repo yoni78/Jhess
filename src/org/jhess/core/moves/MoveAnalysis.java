@@ -6,7 +6,7 @@ import org.jhess.core.pieces.Piece;
 
 public class MoveAnalysis {
 
-    private final boolean isValid;
+    private final boolean isLegal;
 
     private final boolean isCastlingMove;
     private final Square rookToCastleSquare; // TODO: 2018-05-05 Change to the actual rook
@@ -25,7 +25,7 @@ public class MoveAnalysis {
                  boolean isEnPassant, Piece capturedPawn,
                  boolean isCheck) {
 
-        this.isValid = isValid;
+        this.isLegal = isValid;
         this.isCastlingMove = isCastlingMove;
         this.rookToCastleSquare = rookToCastleSquare;
         this.isPromotionMove = isPromotionMove;
@@ -35,8 +35,8 @@ public class MoveAnalysis {
         this.isCheck = isCheck;
     }
 
-    public boolean isValid() {
-        return isValid;
+    public boolean isLegal() {
+        return isLegal;
     }
 
     public boolean isCastlingMove() {

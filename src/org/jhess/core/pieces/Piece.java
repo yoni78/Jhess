@@ -10,7 +10,7 @@ public abstract class Piece {
 
     protected final Alliance alliance;
     protected boolean isFirstMove = true;
-    protected Square square;
+    protected Square square; // TODO: 2018-06-09 Should be immutable
 
     public Piece(Alliance alliance, Square square) {
 
@@ -26,6 +26,8 @@ public abstract class Piece {
     }
 
     public abstract List<MoveVector> getMoveList();
+
+    public abstract Piece getCopy();
 
     public boolean isFirstMove() {
         return isFirstMove;

@@ -7,10 +7,13 @@ import org.jhess.core.pieces.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: 2018-06-09 Should be immutable
+// TODO: 2018-06-09 Treat board as a position
 public class Board {
-    private final Square[][] squares = new Square[8][8];
+    private final Square[][] squares;
 
     public Board() {
+        squares = new Square[8][8];
 
         List<Piece> whitePieces = generatePieces(Alliance.WHITE);
         List<Piece> blackPieces = generatePieces(Alliance.BLACK);
@@ -19,6 +22,10 @@ public class Board {
         List<Piece> blackPawns = generatePawns(Alliance.BLACK);
 
         initializeSquares(whitePieces, blackPieces, whitePawns, blackPawns);
+    }
+
+    public Board(Board board) {
+        squares = copySquares(board.getSquares());
     }
 
     /**
@@ -82,15 +89,22 @@ public class Board {
         }
     }
 
-    public Square addMoveToSquare(Square square, MoveVector moveVector){
-        int rank = square.getRank() + moveVector.getRankToAdvance();
-        int file = square.getFile() + moveVector.getFileToAdvance();
+    /**
+     * Copies the square from another board to a new board of squares.
+     * @param squares The square of the other board.
+     * @return A copied board of the squares.
+     */
+    private Square[][] copySquares(Square[][] squares){
 
-        if (rank < 0 || rank > 7 || file < 0 || file > 7){
-            return null; // TODO: 2018-05-17 throw an exception?
+        Square[][] newSquares = new Square[8][8];
+
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++) {
+                newSquares[i][j] = new Square(squares[i][j]);
+            }
         }
 
-        return squares[rank][file];
+        return newSquares;
     }
 
     public Square[][] getSquares() {

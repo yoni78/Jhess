@@ -33,4 +33,9 @@ public class Bishop extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new Bishop(alliance, square);
+    }
 }

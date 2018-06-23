@@ -1,12 +1,11 @@
-package org.jhess.logics.moves;
+package org.jhess.core.moves;
 
 import org.jhess.core.board.Square;
-import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 
 public class MoveAnalysisBuilder {
 
-    private boolean isValid = false;
+    private boolean isLegal = false;
     private boolean isCastlingMove = false;
     private Square rookToCastleSquare = null;
     private boolean isPromotionMove = false;
@@ -15,8 +14,8 @@ public class MoveAnalysisBuilder {
     private Piece capturedPawn;
     private boolean isCheck;
 
-    public MoveAnalysisBuilder setIsValid(boolean isValid) {
-        this.isValid = isValid;
+    public MoveAnalysisBuilder setIsLegal(boolean isValid) {
+        this.isLegal = isValid;
         return this;
     }
 
@@ -56,6 +55,6 @@ public class MoveAnalysisBuilder {
     }
 
     public MoveAnalysis createMoveValidation() {
-        return new MoveAnalysis(isValid, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, capturedPawn, isCheck);
+        return new MoveAnalysis(isLegal, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, capturedPawn, isCheck);
     }
 }

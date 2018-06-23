@@ -35,4 +35,9 @@ public class Knight extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new Knight(alliance, square);
+    }
 }

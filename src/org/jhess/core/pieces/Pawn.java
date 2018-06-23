@@ -28,4 +28,9 @@ public class Pawn extends Piece {
 
         return moveVectorList;
     }
+
+    @Override
+    public Piece getCopy() {
+        return new Pawn(alliance, square);
+    }
 }

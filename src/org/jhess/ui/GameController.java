@@ -5,22 +5,21 @@ import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.GameMove;
-import org.jhess.core.moves.MoveAnalyser;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
+import org.jhess.logics.moves.MoveAnalyser;
+import org.jhess.logics.moves.MoveUtils;
 import org.jhess.logics.moves.MovesLogic;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.logics.moves.MoveUtils.movePiece;
-
 // TODO: 2018-05-21 Add a different class to handle the manage the game flow?
 public class GameController {
 
-    private final Board board;
+    private Board board;
     private final GameWindow gameWindow;
 
     private SquarePanel srcSquare = null;
@@ -133,8 +132,8 @@ public class GameController {
 
         MoveAnalysis moveAnalysis = MoveAnalyser.analyseMove(board, srcSquare.getSquare(), destSquare, lastPlayedPiece, lastMoveVector);
 
-        if (moveAnalysis.isValid() && pieceToMove.getAlliance() == playerToMove) {
-            movePiece(srcSquare.getSquare(), destSquare);
+        if (moveAnalysis.isLegal() && pieceToMove.getAlliance() == playerToMove) {
+            board = MoveUtils.movePiece(board, srcSquare.getSquare(), destSquare);
 
             handleSpecialMoves(moveAnalysis);
 
@@ -155,14 +154,14 @@ public class GameController {
      */
     private void handleSpecialMoves(MoveAnalysis moveAnalysis) {
         if (moveAnalysis.isCastlingMove()) {
-            MovesLogic.castlingMove(board, moveAnalysis);
+            board = MovesLogic.castlingMove(board, moveAnalysis);
 
         } else if (moveAnalysis.isEnPassant()) {
-            MovesLogic.enPassantMove(moveAnalysis);
+            board = MovesLogic.enPassantMove(board, moveAnalysis);
         }
 
         if (moveAnalysis.isPromotionMove()) {
-            MovesLogic.promotionMove(moveAnalysis);
+            board = MovesLogic.promotionMove(board, moveAnalysis);
         }
     }
 
