@@ -4,8 +4,7 @@ import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
-import org.jhess.core.pieces.Piece;
-import org.jhess.core.pieces.Queen;
+import org.jhess.core.pieces.*;
 import org.jhess.logics.Board.BoardUtils;
 
 import java.util.Objects;
@@ -47,14 +46,28 @@ public final class MovesLogic {
      *
      * @param moveAnalysis The analysis of the move.
      */
-    public static Board promotionMove(Board board, MoveAnalysis moveAnalysis) {
-        Alliance pawnToPromoteAlliance = moveAnalysis.getPromotionSquare().getPiece().getAlliance();
-        Piece newPiece = new Queen(pawnToPromoteAlliance, moveAnalysis.getPromotionSquare()); // TODO: 2018-05-05 Should be selected by the user
+    public static Board promotionMove(Board board, MoveAnalysis moveAnalysis, Alliance currentPlayer, PieceType pieceType) {
+        Piece newPiece = null;
+
+        switch (pieceType){
+
+            case BISHOP:
+                newPiece = new Bishop(currentPlayer, moveAnalysis.getPromotionSquare());
+                break;
+            case KNIGHT:
+                newPiece = new Knight(currentPlayer, moveAnalysis.getPromotionSquare());
+                break;
+            case ROOK:
+                newPiece = new Rook(currentPlayer, moveAnalysis.getPromotionSquare());
+                break;
+            case QUEEN:
+                newPiece = new Queen(currentPlayer, moveAnalysis.getPromotionSquare());
+                break;
+        }
 
         Board newBoard = new Board(board);
         Square promotionSquare = moveAnalysis.getPromotionSquare();
         Square newSquare = newBoard.getSquares()[promotionSquare.getRank()][promotionSquare.getFile()];
-
 
         newSquare.setPiece(newPiece);
 

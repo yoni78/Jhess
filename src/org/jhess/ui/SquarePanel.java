@@ -45,30 +45,10 @@ class SquarePanel extends JPanel {
     }
 
     private void addMouseControls() {
-        addMouseListener(new MouseListener() {
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 fireSquareClickedEvent(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
             }
         });
     }

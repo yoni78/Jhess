@@ -24,7 +24,7 @@ public class GameController {
 
     private SquarePanel srcSquare = null;
     private Piece pieceToMove;
-    private Alliance playerToMove = Alliance.WHITE;
+    private Alliance currentPlayer = Alliance.WHITE;
     private List<GameMove> gameMoves = new ArrayList<>();
 
     GameController(Board board, GameWindow gameWindow) {
@@ -43,14 +43,14 @@ public class GameController {
     }
 
     /**
-     * Changes the playerToMove to the alliance of the player who should play next.
+     * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn() {
-        if (playerToMove == Alliance.WHITE) {
-            playerToMove = Alliance.BLACK;
+        if (currentPlayer == Alliance.WHITE) {
+            currentPlayer = Alliance.BLACK;
 
         } else {
-            playerToMove = Alliance.WHITE;
+            currentPlayer = Alliance.WHITE;
         }
     }
 
@@ -101,7 +101,7 @@ public class GameController {
     private void firstClick(SquarePanel clickedSquare) {
         Square square = clickedSquare.getSquare();
 
-        if (square.getPiece() != null && square.getPiece().getAlliance() == playerToMove) {
+        if (square.getPiece() != null && square.getPiece().getAlliance() == currentPlayer) {
 
             if (srcSquare != null) {
                 srcSquare.removeHighLight();
@@ -132,7 +132,7 @@ public class GameController {
 
         MoveAnalysis moveAnalysis = MoveAnalyser.analyseMove(board, srcSquare.getSquare(), destSquare, lastPlayedPiece, lastMoveVector);
 
-        if (moveAnalysis.isLegal() && pieceToMove.getAlliance() == playerToMove) {
+        if (moveAnalysis.isLegal() && pieceToMove.getAlliance() == currentPlayer) {
             board = MoveUtils.movePiece(board, srcSquare.getSquare(), destSquare);
 
             handleSpecialMoves(moveAnalysis);
@@ -161,10 +161,12 @@ public class GameController {
         }
 
         if (moveAnalysis.isPromotionMove()) {
-            board = MovesLogic.promotionMove(board, moveAnalysis);
+            PromotionDialog promotionDialog = new PromotionDialog(currentPlayer);
+            promotionDialog.setVisible(true);
+
+            board = MovesLogic.promotionMove(board, moveAnalysis, currentPlayer, promotionDialog.getSelectedPieceType());
         }
     }
-
 
     public Board getBoard() {
         return board;

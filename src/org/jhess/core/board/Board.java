@@ -7,8 +7,7 @@ import org.jhess.core.pieces.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: 2018-06-09 Should be immutable
-// TODO: 2018-06-09 Treat board as a position
+
 public class Board {
     private final Square[][] squares;
 
@@ -90,8 +89,8 @@ public class Board {
     }
 
     /**
-     * Copies the square from another board to a new board of squares.
-     * @param squares The square of the other board.
+     * Copies the squares from another board to a new board of squares.
+     * @param squares The squares of the other board.
      * @return A copied board of the squares.
      */
     private Square[][] copySquares(Square[][] squares){

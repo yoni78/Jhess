@@ -48,7 +48,6 @@ public class MoveAnalyser {
             }
         }
 
-        // TODO: 2018-05-11 Player should get out of check
         // TODO: 2018-06-16 Check for check at the beginning of the turn, before the player makes a move.
         if (isCheck(board, piece.getAlliance())) {
             validationBuilder.setIsCheck(true);
@@ -327,6 +326,12 @@ public class MoveAnalyser {
         return !destSquare.isOccupied() || destSquare.getPiece().getAlliance() != piece.getAlliance();
     }
 
+    /**
+     * Checks if the given player is in check.
+     * @param board The game board.
+     * @param playerAlliance The player to check for check.
+     * @return If the player is in check or not.
+     */
     private static boolean isCheck(Board board, Alliance playerAlliance) {
 
         King king = BoardUtils.getKing(board, playerAlliance);
