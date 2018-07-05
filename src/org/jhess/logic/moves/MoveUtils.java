@@ -1,14 +1,11 @@
-package org.jhess.logics.moves;
+package org.jhess.logic.moves;
 
 
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveVector;
-import org.jhess.core.pieces.Bishop;
-import org.jhess.core.pieces.Knight;
 import org.jhess.core.pieces.Piece;
-import org.jhess.core.pieces.Rook;
-import org.jhess.logics.pieces.PieceUtils;
+import org.jhess.logic.pieces.PieceUtils;
 
 public final class MoveUtils {
     private MoveUtils() {

@@ -1,11 +1,11 @@
-package org.jhess.logics.moves;
+package org.jhess.logic.moves;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.*;
-import org.jhess.logics.Board.BoardUtils;
+import org.jhess.logic.Board.BoardUtils;
 
 import java.util.Objects;
 

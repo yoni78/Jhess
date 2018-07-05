@@ -24,14 +24,25 @@ class BoardPanel extends JPanel {
         validate();
     }
 
-    private void populateSquares(Board board) {
+    private void populateSquares(Board board, boolean reverse) {
         squarePanels = new ArrayList<>();
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
 
-                int newRank =  7 - i;
-                SquarePanel squarePanel = new SquarePanel(this, board.getSquares()[newRank][j], SQUARE_PANEL_DIMENSION);
+                int rank;
+                int file;
+
+                if (!reverse){
+                    rank = 7 - i;
+                    file = j;
+
+                } else {
+                    rank = i;
+                    file = 7 -j;
+                }
+
+                SquarePanel squarePanel = new SquarePanel(this, board.getSquares()[rank][file], SQUARE_PANEL_DIMENSION);
                 squarePanel.addSquareClickedListener(this::handleSquareClicked);
 
                 squarePanels.add(squarePanel);
@@ -44,10 +55,11 @@ class BoardPanel extends JPanel {
         return squarePanels;
     }
 
-    public void drawBoard(Board board) {
+    public void drawBoard(Board board, boolean reverse) {
+        // TODO: Add an option to draw the board in reverse for black
         removeAll();
 
-        populateSquares(board);
+        populateSquares(board, reverse);
 
         for (SquarePanel squarePanel : squarePanels) {
             squarePanel.drawSquare();

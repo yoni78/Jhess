@@ -1,4 +1,4 @@
-package org.jhess.logics.moves;
+package org.jhess.logic.moves;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
@@ -7,8 +7,8 @@ import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.*;
 import org.jhess.core.moves.MoveAnalysisBuilder;
-import org.jhess.logics.Board.BoardUtils;
-import org.jhess.logics.pieces.PieceUtils;
+import org.jhess.logic.Board.BoardUtils;
+import org.jhess.logic.pieces.PieceUtils;
 
 import java.util.List;
 
@@ -355,7 +355,7 @@ public class MoveAnalyser {
             boolean isRookOrQueenCheck = (otherPiece instanceof Rook || otherPiece instanceof Queen) && MoveUtils.isRookMove(possibleMove);
             boolean isBishopOrQueenCheck = (otherPiece instanceof Bishop || otherPiece instanceof Queen) && MoveUtils.isBishopMove(possibleMove);
             boolean isKnightCheck = otherPiece instanceof Knight && MoveUtils.isKnightMove(possibleMove);
-            boolean isPawnCheck = otherPiece instanceof Pawn && MoveUtils.isPawnMove(possibleMove);
+            boolean isPawnCheck = otherPiece instanceof Pawn && MoveUtils.isPawnMove(possibleMove); // FIXME (Doesn't check for pawn capture move)
 
             if (hasNoPieceInHisWay(board, king, possibleMove, king.getSquare()) &&
                     (isRookOrQueenCheck || isBishopOrQueenCheck || isKnightCheck || isPawnCheck)) {

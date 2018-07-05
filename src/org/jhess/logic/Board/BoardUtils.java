@@ -1,4 +1,4 @@
-package org.jhess.logics.Board;
+package org.jhess.logic.Board;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
@@ -7,7 +7,6 @@ import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.King;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 public final class BoardUtils {
 

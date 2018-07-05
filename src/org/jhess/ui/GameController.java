@@ -8,9 +8,9 @@ import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
-import org.jhess.logics.moves.MoveAnalyser;
-import org.jhess.logics.moves.MoveUtils;
-import org.jhess.logics.moves.MovesLogic;
+import org.jhess.logic.moves.MoveAnalyser;
+import org.jhess.logic.moves.MoveUtils;
+import org.jhess.logic.moves.MovesLogic;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class GameController {
      */
     private void initiate() {
         gameWindow.getBoardPanel().addSquareClickedListener(this::handleSquareClicked);
-        gameWindow.getBoardPanel().drawBoard(board);
+        gameWindow.getBoardPanel().drawBoard(board, false);
     }
 
     /**
@@ -52,6 +52,14 @@ public class GameController {
         } else {
             currentPlayer = Alliance.WHITE;
         }
+    }
+
+    /**
+     * Draws the board in the correct orientation for the current player.
+     */
+    private void drawBoard(){
+        boolean reverseBoard = currentPlayer == Alliance.BLACK;
+        SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(board, reverseBoard));
     }
 
     /**
@@ -144,7 +152,7 @@ public class GameController {
         srcSquare = null;
         pieceToMove = null;
 
-        SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(board));
+        drawBoard();
     }
 
     /**

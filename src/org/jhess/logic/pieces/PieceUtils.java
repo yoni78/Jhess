@@ -1,4 +1,4 @@
-package org.jhess.logics.pieces;
+package org.jhess.logic.pieces;
 
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Bishop;
