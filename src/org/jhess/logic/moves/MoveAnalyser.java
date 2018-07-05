@@ -355,7 +355,7 @@ public class MoveAnalyser {
             boolean isRookOrQueenCheck = (otherPiece instanceof Rook || otherPiece instanceof Queen) && MoveUtils.isRookMove(possibleMove);
             boolean isBishopOrQueenCheck = (otherPiece instanceof Bishop || otherPiece instanceof Queen) && MoveUtils.isBishopMove(possibleMove);
             boolean isKnightCheck = otherPiece instanceof Knight && MoveUtils.isKnightMove(possibleMove);
-            boolean isPawnCheck = otherPiece instanceof Pawn && MoveUtils.isPawnMove(possibleMove); // FIXME (Doesn't check for pawn capture move)
+            boolean isPawnCheck = otherPiece instanceof Pawn &&  MoveUtils.isPawnCaptureMove(possibleMove);
 
             if (hasNoPieceInHisWay(board, king, possibleMove, king.getSquare()) &&
                     (isRookOrQueenCheck || isBishopOrQueenCheck || isKnightCheck || isPawnCheck)) {
