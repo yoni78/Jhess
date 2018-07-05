@@ -5,8 +5,11 @@ import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.King;
+import org.jhess.core.pieces.Piece;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class BoardUtils {
 
@@ -37,7 +40,6 @@ public final class BoardUtils {
         }
     }
 
-    // TODO: 2018-06-08 Make more generic so you could find any piece
     /**
      * Finds the king of the given alliance on the board.
      *
@@ -71,5 +73,20 @@ public final class BoardUtils {
         }
 
         return board.getSquares()[rank][file];
+    }
+
+    /**
+     * Gets all of the pieces of the given player.
+     * @param board The game board.
+     * @param player The player.
+     * @return The player's pieces.
+     */
+    public static List<Piece> getPieces(Board board, Alliance player){
+        return Arrays.stream(board.getSquares())
+                .flatMap(Arrays::stream)
+                .filter(square -> square.getPiece() != null)
+                .filter(square -> square.getPiece()!= null && square.getPiece().getAlliance() == player)
+                .map(Square::getPiece)
+                .collect(Collectors.toList());
     }
 }

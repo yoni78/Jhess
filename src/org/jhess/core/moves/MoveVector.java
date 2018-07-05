@@ -70,6 +70,14 @@ public class MoveVector {
         return new MoveVector(newRankToAdvance, newFileToAdvance);
     }
 
+    /**
+     * Reverses the MoveVector.
+     * @return A reverse MoveVector.
+     */
+    public MoveVector reverse(){
+        return new MoveVector(-rankToAdvance, -fileToAdvance);
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof MoveVector &&

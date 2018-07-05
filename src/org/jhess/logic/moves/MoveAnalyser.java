@@ -14,11 +14,9 @@ import java.util.List;
 
 import static org.jhess.core.moves.MoveVector.*;
 
-public class MoveAnalyser {
+public final class MoveAnalyser {
     private MoveAnalyser() {
     }
-
-    // TODO: 2018-04-29 Check, Mate
 
     /**
      * Determines if the given move is a legal one.
@@ -46,16 +44,15 @@ public class MoveAnalyser {
             } else if (piece instanceof Queen || piece instanceof Rook || piece instanceof Bishop || piece instanceof Knight) {
                 validationBuilder = validateRegularPieceMove(piece, moveVector);
             }
-        }
 
-        // TODO: 2018-06-16 Check for check at the beginning of the turn, before the player makes a move.
-        if (isCheck(board, piece.getAlliance())) {
-            validationBuilder.setIsCheck(true);
+            if (isCheck(board, piece.getAlliance())) {
+                validationBuilder.setIsCheck(true);
 
-            Board newBoard = MoveUtils.movePiece(board, srcSquare, destSquare);
+                Board newBoard = MoveUtils.movePiece(board, srcSquare, destSquare);
 
-            if (isCheck(newBoard, piece.getAlliance())){
-                validationBuilder.setIsLegal(false);
+                if (isCheck(newBoard, piece.getAlliance())){
+                    validationBuilder.setIsLegal(false);
+                }
             }
         }
 
@@ -329,12 +326,12 @@ public class MoveAnalyser {
     /**
      * Checks if the given player is in check.
      * @param board The game board.
-     * @param playerAlliance The player to check for check.
+     * @param alliance The player to check for check.
      * @return If the player is in check or not.
      */
-    private static boolean isCheck(Board board, Alliance playerAlliance) {
+    private static boolean isCheck(Board board, Alliance alliance) {
 
-        King king = BoardUtils.getKing(board, playerAlliance);
+        King king = BoardUtils.getKing(board, alliance);
 
         List<MoveVector> possibleMoves = PieceUtils.getRookMoves();
         possibleMoves.addAll(PieceUtils.getBishopMoves());
@@ -343,26 +340,68 @@ public class MoveAnalyser {
         for (MoveVector possibleMove : possibleMoves) {
             Square destSquare = BoardUtils.addMoveToSquare(board, king.getSquare(), possibleMove);
 
-            if (destSquare == null || destSquare.getPiece() == null || destSquare.getPiece().getAlliance() == playerAlliance) {
+            if (destSquare == null || destSquare.getPiece() == null || destSquare.getPiece().getAlliance() == alliance) {
                 continue;
             }
 
             Piece otherPiece = destSquare.getPiece();
-            if (otherPiece == null) {
-                continue;
-            }
 
             boolean isRookOrQueenCheck = (otherPiece instanceof Rook || otherPiece instanceof Queen) && MoveUtils.isRookMove(possibleMove);
             boolean isBishopOrQueenCheck = (otherPiece instanceof Bishop || otherPiece instanceof Queen) && MoveUtils.isBishopMove(possibleMove);
             boolean isKnightCheck = otherPiece instanceof Knight && MoveUtils.isKnightMove(possibleMove);
             boolean isPawnCheck = otherPiece instanceof Pawn &&  MoveUtils.isPawnCaptureMove(possibleMove);
 
-            if (hasNoPieceInHisWay(board, king, possibleMove, king.getSquare()) &&
+            if (hasNoPieceInHisWay(board, otherPiece, possibleMove.reverse(), destSquare) &&
                     (isRookOrQueenCheck || isBishopOrQueenCheck || isKnightCheck || isPawnCheck)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the given player is mated.
+     * @param board The game board.
+     * @param alliance The player to check for mate.
+     * @return If the player is mated or not.
+     */
+    public static boolean isMate(Board board, Alliance alliance, Piece lastPlayedPiece, MoveVector lastPlayedMove){
+
+        if (alliance == Alliance.WHITE){
+            alliance = Alliance.BLACK;
+        } else {
+            alliance = Alliance.WHITE;
+        }
+
+        if(!isCheck(board, alliance)){
+            return false;
+        }
+
+        // Get all the pieces of the player
+        List<Piece> pieces = BoardUtils.getPieces(board, alliance);
+
+        // If moving any of them leads to a position without check, the it's not mate
+        for(Piece piece : pieces){
+            for (MoveVector moveVector : piece.getMoveList()){
+                Square destSquare = BoardUtils.addMoveToSquare(board, piece.getSquare(), moveVector);
+                if (destSquare == null){
+                    continue;
+                }
+
+                MoveAnalysis moveAnalysis = MoveAnalyser.analyseMove(board, piece.getSquare(), destSquare, lastPlayedPiece, lastPlayedMove);
+                if (!moveAnalysis.isLegal()){
+                    continue;
+                }
+
+                // TODO: Special moves
+                Board newBoard = MoveUtils.movePiece(board, piece.getSquare(), destSquare);
+                if(!isCheck(newBoard, alliance)){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

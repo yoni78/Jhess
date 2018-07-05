@@ -13,6 +13,7 @@ import org.jhess.logic.moves.MoveUtils;
 import org.jhess.logic.moves.MovesLogic;
 
 import javax.swing.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,18 +47,38 @@ public class GameController {
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn() {
+
+        GameMove lastMove = Iterables.getLast(gameMoves, null);
+        MoveVector lastMoveVector = null;
+        Piece lastPlayedPiece = null;
+
+        if (lastMove != null) {
+            lastMoveVector = new MoveVector(lastMove.getSrcSquare(), lastMove.getDestSquare());
+            lastPlayedPiece = lastMove.getPlayedPiece();
+        }
+
+        if (MoveAnalyser.isMate(board, currentPlayer, lastPlayedPiece, lastMoveVector)) {
+            drawBoard();
+            JOptionPane.showMessageDialog(null,
+                    MessageFormat.format("Checkmate! {0} is the winner.", currentPlayer.toString()));
+
+            gameWindow.setVisible(false);
+        }
+
         if (currentPlayer == Alliance.WHITE) {
             currentPlayer = Alliance.BLACK;
 
         } else {
             currentPlayer = Alliance.WHITE;
         }
+
+        drawBoard();
     }
 
     /**
      * Draws the board in the correct orientation for the current player.
      */
-    private void drawBoard(){
+    private void drawBoard() {
         boolean reverseBoard = currentPlayer == Alliance.BLACK;
         SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(board, reverseBoard));
     }
@@ -94,7 +115,7 @@ public class GameController {
      * Handles a right mouse click.
      */
     private void rightMouseClicked() {
-        if (srcSquare != null){
+        if (srcSquare != null) {
             srcSquare.removeHighLight();
             srcSquare = null;
             pieceToMove = null;
@@ -149,12 +170,10 @@ public class GameController {
             nextTurn();
         }
 
-        srcSquare = null;
-        pieceToMove = null;
-
-        drawBoard();
+        rightMouseClicked();
     }
 
+    // TODO: Should not be handled here!!
     /**
      * Performs all of the necessary actions for a special move.
      *

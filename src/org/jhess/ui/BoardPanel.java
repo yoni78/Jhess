@@ -56,7 +56,6 @@ class BoardPanel extends JPanel {
     }
 
     public void drawBoard(Board board, boolean reverse) {
-        // TODO: Add an option to draw the board in reverse for black
         removeAll();
 
         populateSquares(board, reverse);
