@@ -14,8 +14,8 @@ public class MoveAnalysisBuilder {
     private Piece capturedPawn;
     private boolean isCheck;
 
-    public MoveAnalysisBuilder setIsLegal(boolean isValid) {
-        this.isLegal = isValid;
+    public MoveAnalysisBuilder setIsLegal(boolean isLegal) {
+        this.isLegal = isLegal;
         return this;
     }
 

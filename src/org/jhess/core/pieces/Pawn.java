@@ -13,11 +13,11 @@ public class Pawn extends Piece {
 
 
     public Pawn(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.PAWN );
     }
 
     public Pawn(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.PAWN);
     }
 
     // TODO: Add capture moves(?)
@@ -31,6 +31,8 @@ public class Pawn extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new Pawn(alliance, square);
+        Pawn copy = new Pawn(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

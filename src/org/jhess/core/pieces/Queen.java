@@ -14,11 +14,11 @@ public class Queen extends Piece {
 
 
     public Queen(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.QUEEN);
     }
 
     public Queen(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.QUEEN);
     }
 
     @Override
@@ -37,6 +37,8 @@ public class Queen extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new Queen(alliance, square);
+        Queen copy = new Queen(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

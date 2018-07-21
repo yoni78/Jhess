@@ -13,11 +13,11 @@ public class Bishop extends Piece {
 
 
     public Bishop(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.BISHOP);
     }
 
     public Bishop(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.BISHOP);
     }
 
     @Override
@@ -36,6 +36,8 @@ public class Bishop extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new Bishop(alliance, square);
+        Bishop copy = new Bishop(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

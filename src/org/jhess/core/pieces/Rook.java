@@ -13,11 +13,11 @@ public class Rook extends Piece {
 
 
     public Rook(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.ROOK);
     }
 
     public Rook(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.ROOK);
     }
 
     @Override
@@ -36,6 +36,8 @@ public class Rook extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new Rook(alliance ,square);
+        Rook copy = new Rook(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

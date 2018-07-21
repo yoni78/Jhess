@@ -13,11 +13,11 @@ public class Knight extends Piece {
 
 
     public Knight(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.KNIGHT);
     }
 
     public Knight(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.KNIGHT);
     }
 
     @Override
@@ -38,6 +38,8 @@ public class Knight extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new Knight(alliance, square);
+        Knight copy = new Knight(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

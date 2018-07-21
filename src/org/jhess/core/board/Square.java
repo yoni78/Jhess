@@ -2,16 +2,18 @@ package org.jhess.core.board;
 
 import org.jhess.core.pieces.Piece;
 
+import java.util.Objects;
+
 public class Square {
     private Piece piece;
     private final int rank;
     private final int file;
 
-    Square(int rank, int file) {
+    public Square(int rank, int file) {
         this(rank, file, null);
     }
 
-    Square(int rank, int file, Piece piece){
+    public Square(int rank, int file, Piece piece){
 
         if ((rank < 0 || rank > 7) || (file < 0 || file > 7)){
             throw new IllegalArgumentException("The rank and file of a square should be between 0 and 7.");
@@ -37,7 +39,7 @@ public class Square {
     }
 
     public Piece getPiece() {
-        return piece;
+        return piece != null ? piece.getCopy() : null;
     }
 
     public void setPiece(Piece piece) {
@@ -54,5 +56,21 @@ public class Square {
 
     public boolean isOccupied(){
         return piece != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Square square = (Square) o;
+        return rank == square.rank &&
+                file == square.file &&
+                Objects.equals(piece, square.piece);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(piece, rank, file);
     }
 }

@@ -12,11 +12,11 @@ import static org.jhess.core.moves.MoveVector.*;
 public class King extends Piece {
 
     public King(Alliance alliance, Square square) {
-        super(alliance, square);
+        super(alliance, square, PieceType.KING);
     }
 
     public King(Alliance alliance) {
-        super(alliance);
+        super(alliance, PieceType.KING);
     }
 
     @Override
@@ -37,6 +37,8 @@ public class King extends Piece {
 
     @Override
     public Piece getCopy() {
-        return new King(alliance, square);
+        King copy = new King(alliance, square);
+        copy.setFirstMove(isFirstMove);
+        return copy;
     }
 }

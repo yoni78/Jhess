@@ -5,11 +5,11 @@ import org.jhess.core.pieces.Piece;
 
 
 public class MoveAnalysis {
-
+    // TODO: 2018-07-21 Add isCaptureMove
     private final boolean isLegal;
 
     private final boolean isCastlingMove;
-    private final Square rookToCastleSquare; // TODO: 2018-05-05 Change to the actual rook
+    private final Square rookToCastleSquare;
 
     private final boolean isPromotionMove;
     private final Square promotionSquare;

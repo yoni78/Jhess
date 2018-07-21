@@ -1,10 +1,7 @@
 package org.jhess.logic.pieces;
 
 import org.jhess.core.moves.MoveVector;
-import org.jhess.core.pieces.Bishop;
-import org.jhess.core.pieces.Knight;
-import org.jhess.core.pieces.Pawn;
-import org.jhess.core.pieces.Rook;
+import org.jhess.core.pieces.*;
 
 import java.util.List;
 
@@ -28,5 +25,29 @@ public final class PieceUtils {
 
     public static List<MoveVector> getPawnMoves(){
         return new Pawn(null).getMoveList();
+    }
+
+    public static boolean isPawn(Piece piece){
+        return piece.getPieceType() == PieceType.PAWN;
+    }
+
+    public static boolean isKnight(Piece piece){
+        return piece.getPieceType() == PieceType.KNIGHT;
+    }
+
+    public static boolean isBishop(Piece piece){
+        return piece.getPieceType() == PieceType.BISHOP;
+    }
+
+    public static boolean isRook(Piece piece){
+        return piece.getPieceType() == PieceType.ROOK;
+    }
+
+    public static boolean isQueen(Piece piece){
+        return piece.getPieceType() == PieceType.QUEEN;
+    }
+
+    public static boolean isKing(Piece piece){
+        return piece.getPieceType() == PieceType.KING;
     }
 }

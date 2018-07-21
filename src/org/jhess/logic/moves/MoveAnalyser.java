@@ -4,59 +4,111 @@ import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
-import org.jhess.core.moves.MoveVector;
-import org.jhess.core.pieces.*;
 import org.jhess.core.moves.MoveAnalysisBuilder;
-import org.jhess.logic.Board.BoardUtils;
+import org.jhess.core.moves.MoveVector;
+import org.jhess.core.pieces.Pawn;
+import org.jhess.core.pieces.Piece;
+import org.jhess.logic.board.BoardUtils;
+import org.jhess.logic.board.PositionAnalyser;
 import org.jhess.logic.pieces.PieceUtils;
-
-import java.util.List;
 
 import static org.jhess.core.moves.MoveVector.*;
 
-public final class MoveAnalyser {
-    private MoveAnalyser() {
+// TODO: 2018-07-07 Castle through check
+// TODO: 2018-07-20 50 move draw
+// TODO: 2018-07-20 Threefold repetition
+
+public class MoveAnalyser {
+    private final Board position;
+    private MoveAnalysisBuilder analysisBuilder;
+
+    public MoveAnalyser(Board position) {
+        this.position = position;
     }
 
     /**
      * Determines if the given move is a legal one.
      *
-     * @param board      The game board.
      * @param srcSquare  The source square.
      * @param destSquare The Destination square.
      * @return Whether the move is legal or not.
      */
-    public static MoveAnalysis analyseMove(Board board, Square srcSquare, Square destSquare,
-                                           Piece lastMovedPiece, MoveVector lastMoveVector) {
+    public MoveAnalysis analyseMove(Square srcSquare, Square destSquare) {
 
-        MoveAnalysisBuilder validationBuilder = new MoveAnalysisBuilder();
+        PositionAnalyser positionAnalyser = new PositionAnalyser(position);
+        analysisBuilder = new MoveAnalysisBuilder();
+        analysisBuilder.setIsLegal(true);
+
         Piece piece = srcSquare.getPiece();
         MoveVector moveVector = new MoveVector(srcSquare, destSquare);
 
-        if (hasNoPieceInHisWay(board, piece, moveVector, srcSquare) && canLandOnSquare(piece, destSquare)) {
+        // If it's not this player's turn
+        if (piece.getAlliance() != position.getPlayerToMove()) {
+            analysisBuilder.setIsLegal(false);
+        }
 
-            if (piece instanceof King) {
-                validationBuilder = validateKingMove(board, piece, moveVector, destSquare);
+        if (!hasNoPieceInHisWay(piece, moveVector, srcSquare) && canLandOnSquare(piece, destSquare)) {
+            analysisBuilder.setIsLegal(false);
+        }
 
-            } else if (piece instanceof Pawn) {
-                validationBuilder = validatePawnMove(piece, moveVector, destSquare, lastMovedPiece, lastMoveVector);
+        switch (piece.getPieceType()) {
+            case PAWN:
+                validatePawnMove(piece, moveVector, srcSquare, destSquare);
+                break;
+            case KING:
+                validateKingMove(position, piece, moveVector, destSquare);
+                break;
+            default:
+                validateRegularPieceMove(piece, moveVector);
+                break;
+        }
 
-            } else if (piece instanceof Queen || piece instanceof Rook || piece instanceof Bishop || piece instanceof Knight) {
-                validationBuilder = validateRegularPieceMove(piece, moveVector);
-            }
+        if (positionAnalyser.isCheck()) {
+            analysisBuilder.setIsCheck(true);
 
-            if (isCheck(board, piece.getAlliance())) {
-                validationBuilder.setIsCheck(true);
+            Board newBoard = MovePerformer.movePiece(position, srcSquare, destSquare);
 
-                Board newBoard = MoveUtils.movePiece(board, srcSquare, destSquare);
-
-                if (isCheck(newBoard, piece.getAlliance())){
-                    validationBuilder.setIsLegal(false);
-                }
+            if (new PositionAnalyser(newBoard).isCheck()) {
+                analysisBuilder.setIsLegal(false);
             }
         }
 
-        return validationBuilder.createMoveValidation();
+        return analysisBuilder.createMoveValidation();
+    }
+
+    /**
+     * Checks if the piece attempts to jump over another piece in it's moveVector.
+     *
+     * @param piece      The piece to be played.
+     * @param moveVector The MoveVector to be played.
+     * @param srcSquare  The source square of the moveVector.
+     * @return If the path for the moveVector is clear.
+     */
+    public boolean hasNoPieceInHisWay(Piece piece, MoveVector moveVector, Square srcSquare) {
+
+        // If the piece is skipping over another piece
+        if (PieceUtils.isKnight(piece)) {
+            return true;
+        }
+
+        int distance = Math.max(Math.abs(moveVector.getRankToAdvance()), Math.abs(moveVector.getFileToAdvance()));
+
+        MoveVector tempMoveVector;
+        Square tempSquare;
+        for (int i = 1; i < distance; i++) {
+            tempMoveVector = moveVector.extend(-i);
+            tempSquare = BoardUtils.addMoveToSquare(position, srcSquare, tempMoveVector);
+
+            if (tempSquare == null) {
+                return true;
+            }
+
+            if (tempSquare.isOccupied()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -65,64 +117,59 @@ public final class MoveAnalyser {
      * @param pawn       The pawn to be played.
      * @param moveVector The moveVector to be played.
      * @param destSquare The destination square of the moveVector.
-     * @return A validation of the moveVector.
      */
-    private static MoveAnalysisBuilder validatePawnMove(Piece pawn, MoveVector moveVector, Square destSquare,
-                                                        Piece lastMovedPiece, MoveVector lastMoveVector) {
+    private void validatePawnMove(Piece pawn, MoveVector moveVector, Square srcSquare, Square destSquare) {
+        if (!isPawnCaptureMove(pawn, moveVector, destSquare, false) &&
+                !MoveUtils.isPawnDoubleMove(srcSquare, pawn, moveVector) &&
+                !MoveUtils.isRegularPawnMove(pawn, moveVector, destSquare)) {
 
-        boolean isValid = false;
+            if (isEnPassantMove(pawn, moveVector, destSquare)) {
+                Pawn capturedPawn = (Pawn) position.getEnPassantTarget().getPiece();
+                analysisBuilder.setIsEnPassant(true).setCapturedPawn(capturedPawn);
 
-        boolean isPawnEnPassantMove = false;
-        Pawn capturedPawn = null;
-
-        boolean isPromotionMove = false;
-        Square promotionSquare = null;
-
-        if (isPawnCaptureMove(pawn, moveVector, destSquare, false)) {
-            isValid = true;
-
-        } else if (isPawnDoubleMove(pawn, moveVector, false)) {
-            isValid = true;
-
-        } else if (isEnPassantMove(pawn, moveVector, destSquare, lastMovedPiece, lastMoveVector)) {
-            isValid = true;
-            isPawnEnPassantMove = true;
-            capturedPawn = (Pawn) lastMovedPiece;
-
-        } else if (isRegularPawnMove(pawn, moveVector, destSquare)) {
-            isValid = true;
-            pawn.setFirstMove(false);
+            } else {
+                analysisBuilder.setIsLegal(false);
+            }
         }
 
         if (isPawnOnLastRank(destSquare, pawn.getAlliance())) {
-            isPromotionMove = true;
-            promotionSquare = destSquare;
+            analysisBuilder.setIsPromotionMove(true).setPromotionSquare(destSquare);
         }
-
-        return new MoveAnalysisBuilder().setIsLegal(isValid)
-                .setIsEnPassant(isPawnEnPassantMove).setCapturedPawn(capturedPawn)
-                .setIsPromotionMove(isPromotionMove).setPromotionSquare(promotionSquare);
     }
 
     /**
-     * Check if the given moveVector is a regular pawn move.
+     * Validates regular pieces moves (queens, rooks, bishops and knights)
      *
-     * @param pawn       The pawn to be played.
+     * @param piece      The piece to be played.
+     * @param moveVector The moveVector to be played
+     */
+    private void validateRegularPieceMove(Piece piece, MoveVector moveVector) {
+        if (!piece.getMoveList().contains(moveVector)) {
+            analysisBuilder.setIsLegal(false);
+        }
+    }
+
+    /**
+     * Validates king moves.
+     *
+     * @param board      The game board.
+     * @param king       The king to be played.
      * @param moveVector The moveVector to be played.
      * @param destSquare The destination square of the moveVector.
-     * @return If the moveVector is a regular pawn move.
      */
-    private static boolean isRegularPawnMove(Piece pawn, MoveVector moveVector, Square destSquare) {
+    private void validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
 
-        if (destSquare.isOccupied()) {
-            return false;
-        }
+        if (MoveUtils.isCastlingMove(moveVector)) {
+            Square rookSquare = getCastlingRookSquare(board, destSquare, moveVector);
+            analysisBuilder.setIsCastlingMove(true);
+            analysisBuilder.setRookToCastleSquare(rookSquare);
 
-        if (pawn.getAlliance() == Alliance.WHITE) {
-            return moveVector.equals(FORWARD);
+            if (!canCastle(board, rookSquare)) {
+                analysisBuilder.setIsLegal(false);
+            }
 
-        } else {
-            return moveVector.equals(BACKWARD);
+        } else if (!king.getMoveList().contains(moveVector)) {
+            analysisBuilder.setIsLegal(false);
         }
     }
 
@@ -134,12 +181,8 @@ public final class MoveAnalyser {
      * @param destSquare The destination square of the moveVector.
      * @return If the moveVector is an En Passant.
      */
-    private static boolean isEnPassantMove(Piece pawn, MoveVector moveVector, Square destSquare, Piece lastMovedPiece, MoveVector lastMoveVector) {
-
-        return lastMoveVector != null &&
-                lastMovedPiece instanceof Pawn && isPawnDoubleMove(lastMovedPiece, lastMoveVector, true)
-                && isPawnCaptureMove(pawn, moveVector, destSquare, true);
-
+    private boolean isEnPassantMove(Piece pawn, MoveVector moveVector, Square destSquare) {
+        return isPawnCaptureMove(pawn, moveVector, destSquare, true) && position.getEnPassantTarget() != null && position.getEnPassantTarget().equals(destSquare); // TODO: 2018-07-20 TEST (a possible bug was observed)!
     }
 
     /**
@@ -150,9 +193,9 @@ public final class MoveAnalyser {
      * @param destSquare The destination square of the moveVector.
      * @return If the moveVector is a pawn capture moveVector.
      */
-    private static boolean isPawnCaptureMove(Piece pawn, MoveVector moveVector, Square destSquare, boolean checkEnPassant) {
-
-        if (checkEnPassant || destSquare.isOccupied()) {
+    private boolean isPawnCaptureMove(Piece pawn, MoveVector moveVector, Square destSquare, boolean forEnPassant) {
+        // TODO: 2018-07-21 Move to MoveUtils?
+        if (forEnPassant || destSquare.isOccupied()) {
 
             if (pawn.getAlliance() == Alliance.WHITE && (moveVector.equals(FORWARD_RIGHT) || moveVector.equals(FORWARD_LEFT))) {
                 return true;
@@ -165,81 +208,16 @@ public final class MoveAnalyser {
     }
 
     /**
-     * Checks if its a pawn double moveVector.
-     *
-     * @param pawn       The pawn to be played.
-     * @param moveVector The MoveVector to be played.
-     * @return if the moveVector is a pawn double moveVector.
-     */
-    private static boolean isPawnDoubleMove(Piece pawn, MoveVector moveVector, boolean forEnPassant) {
-
-        MoveVector possibleMoveVector;
-        if (pawn.getAlliance() == Alliance.WHITE) {
-            possibleMoveVector = FORWARD.extend(1);
-
-        } else {
-            possibleMoveVector = BACKWARD.extend(1);
-        }
-
-        if (forEnPassant || pawn.isFirstMove() && moveVector.equals(possibleMoveVector)) {
-            pawn.setFirstMove(false); // TODO: 2018-05-04 Not here?
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Checks if the pawn got to the last rank (and should subsequently be promoted)
      *
      * @param destSquare   The destination square of the move.
      * @param pawnAlliance The alliance of the pawn.
      * @return If the pawn got to the last rank.
      */
-    private static boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
+    private boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
+        // TODO: 2018-07-21 Move to a different class?
         return (pawnAlliance == Alliance.WHITE && destSquare.getRank() == 7) ||
                 (pawnAlliance == Alliance.BLACK && destSquare.getRank() == 0);
-    }
-
-    /**
-     * Validates regular pieces moves (queens, rooks, bishops and knights)
-     *
-     * @param piece      The piece to be played.
-     * @param moveVector The moveVector to be played
-     * @return A validation of the moveVector.
-     */
-    private static MoveAnalysisBuilder validateRegularPieceMove(Piece piece, MoveVector moveVector) {
-        return new MoveAnalysisBuilder().setIsLegal(piece.getMoveList().contains(moveVector));
-    }
-
-    /**
-     * Validates king moves.
-     *
-     * @param board      The game board.
-     * @param king       The king to be played.
-     * @param moveVector The moveVector to be played.
-     * @param destSquare The destination square of the moveVector.
-     * @return A validation of the moveVector.
-     */
-    private static MoveAnalysisBuilder validateKingMove(Board board, Piece king, MoveVector moveVector, Square destSquare) {
-
-        MoveAnalysisBuilder validationBuilder = new MoveAnalysisBuilder();
-        validationBuilder.setIsLegal(king.getMoveList().contains(moveVector));
-
-        if (isCastlingMove(moveVector)) {
-            Square rookSquare = getCastlingRookSquare(board, destSquare, moveVector);
-            Piece rook = rookSquare.getPiece();
-
-            if (king.isFirstMove() && rook != null && rook.isFirstMove()) {
-
-                king.setFirstMove(false);
-                rook.setFirstMove(false);
-
-                validationBuilder.setIsLegal(true).setIsCastlingMove(true).setRookToCastleSquare(rookSquare);
-            }
-        }
-
-        return validationBuilder;
     }
 
     /**
@@ -250,8 +228,8 @@ public final class MoveAnalyser {
      * @param moveVector The moveVector to be played.
      * @return The rook that should participate in the castling.
      */
-    private static Square getCastlingRookSquare(Board board, Square destSquare, MoveVector moveVector) {
-
+    private Square getCastlingRookSquare(Board board, Square destSquare, MoveVector moveVector) {
+        // TODO: 2018-07-21 Test for black
         Square rookSquare = null;
 
         // Short
@@ -267,49 +245,23 @@ public final class MoveAnalyser {
     }
 
     /**
-     * Checks if the moveVector is a castling moveVector.
+     * Checks if the attempted castling move is possible.
      *
-     * @param moveVector The moveVector to check.
-     * @return If it's a castling moveVector.
+     * @param board      The current position.
+     * @param rookSquare The square of the rook which will be involved in the castling.
+     * @return Is castling possible in these conditions.
      */
-    private static boolean isCastlingMove(MoveVector moveVector) {
-        return moveVector.equals(LEFT.extend(1)) || moveVector.equals(RIGHT.extend(1));
-    }
+    private boolean canCastle(Board board, Square rookSquare) {
+        // TODO: 2018-07-21 Test that it's not through check
+        boolean whiteCanCastle = board.getPlayerToMove() == Alliance.WHITE &&
+                ((board.isWhiteCanCastleKingSide() && rookSquare.getFile() == 7) ||
+                        (board.isWhiteCanCastleQueenSide() && rookSquare.getFile() == 0));
 
-    /**
-     * Checks if the piece attempts to jump over another piece in it's moveVector.
-     *
-     * @param board      The game board;
-     * @param piece      The piece to be played.
-     * @param moveVector The MoveVector to be played.
-     * @param srcSquare  The source square of the moveVector.
-     * @return If the path for the moveVector is clear.
-     */
-    private static boolean hasNoPieceInHisWay(Board board, Piece piece, MoveVector moveVector, Square srcSquare) {
+        boolean blackCanCastle = board.getPlayerToMove() == Alliance.BLACK &&
+                ((board.isBlackCanCastleKingSide() && rookSquare.getFile() == 7) ||
+                        (board.isBlackCanCastleQueenSide() && rookSquare.getFile() == 0));
 
-        // If the piece is skipping over another piece
-        if (piece instanceof Knight) {
-            return true;
-        }
-
-        int distance = Math.max(Math.abs(moveVector.getRankToAdvance()), Math.abs(moveVector.getFileToAdvance()));
-
-        MoveVector tempMoveVector;
-        Square tempSquare;
-        for (int i = 1; i < distance; i++) {
-            tempMoveVector = moveVector.extend(-i);
-            tempSquare = BoardUtils.addMoveToSquare(board, srcSquare, tempMoveVector);
-
-            if (tempSquare == null) {
-                return true;
-            }
-
-            if (tempSquare.isOccupied()) {
-                return false;
-            }
-        }
-
-        return true;
+        return whiteCanCastle || blackCanCastle;
     }
 
     /**
@@ -319,89 +271,7 @@ public final class MoveAnalyser {
      * @param destSquare The destination square of the move.
      * @return If the piece can land on the square.
      */
-    private static boolean canLandOnSquare(Piece piece, Square destSquare) {
+    private boolean canLandOnSquare(Piece piece, Square destSquare) {
         return !destSquare.isOccupied() || destSquare.getPiece().getAlliance() != piece.getAlliance();
-    }
-
-    /**
-     * Checks if the given player is in check.
-     * @param board The game board.
-     * @param alliance The player to check for check.
-     * @return If the player is in check or not.
-     */
-    private static boolean isCheck(Board board, Alliance alliance) {
-
-        King king = BoardUtils.getKing(board, alliance);
-
-        List<MoveVector> possibleMoves = PieceUtils.getRookMoves();
-        possibleMoves.addAll(PieceUtils.getBishopMoves());
-        possibleMoves.addAll(PieceUtils.getKnightMoves());
-
-        for (MoveVector possibleMove : possibleMoves) {
-            Square destSquare = BoardUtils.addMoveToSquare(board, king.getSquare(), possibleMove);
-
-            if (destSquare == null || destSquare.getPiece() == null || destSquare.getPiece().getAlliance() == alliance) {
-                continue;
-            }
-
-            Piece otherPiece = destSquare.getPiece();
-
-            boolean isRookOrQueenCheck = (otherPiece instanceof Rook || otherPiece instanceof Queen) && MoveUtils.isRookMove(possibleMove);
-            boolean isBishopOrQueenCheck = (otherPiece instanceof Bishop || otherPiece instanceof Queen) && MoveUtils.isBishopMove(possibleMove);
-            boolean isKnightCheck = otherPiece instanceof Knight && MoveUtils.isKnightMove(possibleMove);
-            boolean isPawnCheck = otherPiece instanceof Pawn &&  MoveUtils.isPawnCaptureMove(possibleMove);
-
-            if (hasNoPieceInHisWay(board, otherPiece, possibleMove.reverse(), destSquare) &&
-                    (isRookOrQueenCheck || isBishopOrQueenCheck || isKnightCheck || isPawnCheck)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the given player is mated.
-     * @param board The game board.
-     * @param alliance The player to check for mate.
-     * @return If the player is mated or not.
-     */
-    public static boolean isMate(Board board, Alliance alliance, Piece lastPlayedPiece, MoveVector lastPlayedMove){
-
-        if (alliance == Alliance.WHITE){
-            alliance = Alliance.BLACK;
-        } else {
-            alliance = Alliance.WHITE;
-        }
-
-        if(!isCheck(board, alliance)){
-            return false;
-        }
-
-        // Get all the pieces of the player
-        List<Piece> pieces = BoardUtils.getPieces(board, alliance);
-
-        // If moving any of them leads to a position without check, the it's not mate
-        for(Piece piece : pieces){
-            for (MoveVector moveVector : piece.getMoveList()){
-                Square destSquare = BoardUtils.addMoveToSquare(board, piece.getSquare(), moveVector);
-                if (destSquare == null){
-                    continue;
-                }
-
-                MoveAnalysis moveAnalysis = MoveAnalyser.analyseMove(board, piece.getSquare(), destSquare, lastPlayedPiece, lastPlayedMove);
-                if (!moveAnalysis.isLegal()){
-                    continue;
-                }
-
-                // TODO: Special moves
-                Board newBoard = MoveUtils.movePiece(board, piece.getSquare(), destSquare);
-                if(!isCheck(newBoard, alliance)){
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 }

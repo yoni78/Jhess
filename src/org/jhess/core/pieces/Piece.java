@@ -10,15 +10,17 @@ public abstract class Piece {
 
     protected final Alliance alliance;
     protected boolean isFirstMove = true;
-    protected Square square; // TODO: 2018-06-09 Should be immutable
+    protected Square square; // TODO: 2018-07-21 Remove
+    protected final PieceType pieceType;
 
-    public Piece(Alliance alliance, Square square) {
-
+    public Piece(Alliance alliance, Square square, PieceType pieceType) {
         this.alliance = alliance;
+        this.square = square;
+        this.pieceType = pieceType;
     }
 
-    public Piece(Alliance alliance) {
-        this(alliance, null);
+    public Piece(Alliance alliance, PieceType pieceType) {
+        this(alliance, null, pieceType);
     }
 
     public Alliance getAlliance() {
@@ -43,5 +45,9 @@ public abstract class Piece {
 
     public void setSquare(Square square) {
         this.square = square;
+    }
+
+    public PieceType getPieceType() {
+        return pieceType;
     }
 }

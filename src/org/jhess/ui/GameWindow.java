@@ -7,7 +7,7 @@ public class GameWindow extends JFrame {
 
     private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 400);
 
-    private BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
+    private final BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
 
     public GameWindow() {
         setTitle("Jhess");

@@ -1,4 +1,4 @@
-package org.jhess.logic.Board;
+package org.jhess.logic.board;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
@@ -88,5 +88,23 @@ public final class BoardUtils {
                 .filter(square -> square.getPiece()!= null && square.getPiece().getAlliance() == player)
                 .map(Square::getPiece)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Copies the squares from another board to a array of squares.
+     * @param squares The squares of the other board.
+     * @return A copied array of the squares.
+     */
+    public static Square[][] copySquares(Square[][] squares){
+
+        Square[][] newSquares = new Square[8][8];
+
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++) {
+                newSquares[i][j] = new Square(squares[i][j]);
+            }
+        }
+
+        return newSquares;
     }
 }

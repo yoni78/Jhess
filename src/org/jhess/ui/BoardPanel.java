@@ -39,7 +39,7 @@ class BoardPanel extends JPanel {
 
                 } else {
                     rank = i;
-                    file = 7 -j;
+                    file = 7 - j;
                 }
 
                 SquarePanel squarePanel = new SquarePanel(this, board.getSquares()[rank][file], SQUARE_PANEL_DIMENSION);

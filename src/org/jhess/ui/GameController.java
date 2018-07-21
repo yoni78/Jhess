@@ -1,35 +1,30 @@
 package org.jhess.ui;
 
-import com.google.common.collect.Iterables;
 import org.jhess.core.Alliance;
+import org.jhess.core.Game;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
-import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.Piece;
+import org.jhess.core.pieces.PieceType;
+import org.jhess.logic.board.PositionAnalyser;
 import org.jhess.logic.moves.MoveAnalyser;
-import org.jhess.logic.moves.MoveUtils;
-import org.jhess.logic.moves.MovesLogic;
+import org.jhess.logic.moves.MovePerformer;
 
 import javax.swing.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
-// TODO: 2018-05-21 Add a different class to handle the manage the game flow?
 public class GameController {
 
-    private Board board;
+    private final Game game;
     private final GameWindow gameWindow;
 
     private SquarePanel srcSquare = null;
     private Piece pieceToMove;
-    private Alliance currentPlayer = Alliance.WHITE;
-    private List<GameMove> gameMoves = new ArrayList<>();
 
-    GameController(Board board, GameWindow gameWindow) {
-        this.board = board;
+    GameController(Game game, GameWindow gameWindow) {
+        this.game = game;
         this.gameWindow = gameWindow;
 
         initiate();
@@ -40,47 +35,44 @@ public class GameController {
      */
     private void initiate() {
         gameWindow.getBoardPanel().addSquareClickedListener(this::handleSquareClicked);
-        gameWindow.getBoardPanel().drawBoard(board, false);
+        gameWindow.getBoardPanel().drawBoard(game.getCurrentPosition(), false);
     }
 
     /**
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
-    private void nextTurn() {
+    private void nextTurn(Board newPosition, GameMove playedMove) {
+        game.addTurn(newPosition, playedMove);
 
-        GameMove lastMove = Iterables.getLast(gameMoves, null);
-        MoveVector lastMoveVector = null;
-        Piece lastPlayedPiece = null;
+        PositionAnalyser positionAnalyser = new PositionAnalyser(game.getCurrentPosition());
 
-        if (lastMove != null) {
-            lastMoveVector = new MoveVector(lastMove.getSrcSquare(), lastMove.getDestSquare());
-            lastPlayedPiece = lastMove.getPlayedPiece();
-        }
+        if (positionAnalyser.isMate()) {
+            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
-        if (MoveAnalyser.isMate(board, currentPlayer, lastPlayedPiece, lastMoveVector)) {
-            drawBoard();
+            drawBoard(otherPlayer);
             JOptionPane.showMessageDialog(null,
-                    MessageFormat.format("Checkmate! {0} is the winner.", currentPlayer.toString()));
+                    MessageFormat.format("Checkmate! {0} is the winner.", otherPlayer.toString()));
+
+            gameWindow.setVisible(false);
+
+        } else if (positionAnalyser.isStaleMate()) {
+            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
+
+            drawBoard(otherPlayer);
+            JOptionPane.showMessageDialog(null, "Stalemate!");
 
             gameWindow.setVisible(false);
         }
 
-        if (currentPlayer == Alliance.WHITE) {
-            currentPlayer = Alliance.BLACK;
-
-        } else {
-            currentPlayer = Alliance.WHITE;
-        }
-
-        drawBoard();
+        drawBoard(game.getPlayerToMove());
     }
 
     /**
      * Draws the board in the correct orientation for the current player.
      */
-    private void drawBoard() {
+    private void drawBoard(Alliance currentPlayer) {
         boolean reverseBoard = currentPlayer == Alliance.BLACK;
-        SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(board, reverseBoard));
+        SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(game.getCurrentPosition(), reverseBoard));
     }
 
     /**
@@ -130,7 +122,7 @@ public class GameController {
     private void firstClick(SquarePanel clickedSquare) {
         Square square = clickedSquare.getSquare();
 
-        if (square.getPiece() != null && square.getPiece().getAlliance() == currentPlayer) {
+        if (square.getPiece() != null && square.getPiece().getAlliance() == game.getPlayerToMove()) {
 
             if (srcSquare != null) {
                 srcSquare.removeHighLight();
@@ -149,58 +141,19 @@ public class GameController {
      */
     private void secondClick(SquarePanel clickedSquare) {
         Square destSquare = clickedSquare.getSquare();
+        MovePerformer movePerformer = new MovePerformer(game.getCurrentPosition());
+        MoveAnalysis moveAnalysis = new MoveAnalyser(game.getCurrentPosition()).analyseMove(srcSquare.getSquare(), destSquare);
 
-        GameMove lastMove = Iterables.getLast(gameMoves, null);
-        MoveVector lastMoveVector = null;
-        Piece lastPlayedPiece = null;
-
-        if (lastMove != null) {
-            lastMoveVector = new MoveVector(lastMove.getSrcSquare(), lastMove.getDestSquare());
-            lastPlayedPiece = lastMove.getPlayedPiece();
+        PieceType pieceToPromoteTo = null;
+        if (moveAnalysis.isPromotionMove()) {
+            pieceToPromoteTo = new PromotionDialog(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
         }
 
-        MoveAnalysis moveAnalysis = MoveAnalyser.analyseMove(board, srcSquare.getSquare(), destSquare, lastPlayedPiece, lastMoveVector);
-
-        if (moveAnalysis.isLegal() && pieceToMove.getAlliance() == currentPlayer) {
-            board = MoveUtils.movePiece(board, srcSquare.getSquare(), destSquare);
-
-            handleSpecialMoves(moveAnalysis);
-
-            gameMoves.add(new GameMove(pieceToMove, srcSquare.getSquare(), destSquare));
-            nextTurn();
+        Board newPosition = movePerformer.makeMove(srcSquare.getSquare(), destSquare, pieceToPromoteTo);
+        if (newPosition != null) {
+            nextTurn(newPosition, new GameMove(pieceToMove, srcSquare.getSquare(), destSquare));
         }
 
         rightMouseClicked();
     }
-
-    // TODO: Should not be handled here!!
-    /**
-     * Performs all of the necessary actions for a special move.
-     *
-     * @param moveAnalysis The analysis of the move.
-     */
-    private void handleSpecialMoves(MoveAnalysis moveAnalysis) {
-        if (moveAnalysis.isCastlingMove()) {
-            board = MovesLogic.castlingMove(board, moveAnalysis);
-
-        } else if (moveAnalysis.isEnPassant()) {
-            board = MovesLogic.enPassantMove(board, moveAnalysis);
-        }
-
-        if (moveAnalysis.isPromotionMove()) {
-            PromotionDialog promotionDialog = new PromotionDialog(currentPlayer);
-            promotionDialog.setVisible(true);
-
-            board = MovesLogic.promotionMove(board, moveAnalysis, currentPlayer, promotionDialog.getSelectedPieceType());
-        }
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public GameWindow getGameWindow() {
-        return gameWindow;
-    }
-
 }
