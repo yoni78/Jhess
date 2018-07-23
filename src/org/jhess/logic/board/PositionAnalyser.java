@@ -90,7 +90,7 @@ public class PositionAnalyser {
         for (Piece piece : pieces) {
             for (MoveVector moveVector : piece.getMoveList()) {
                 Square destSquare = BoardUtils.addMoveToSquare(position, piece.getSquare(), moveVector);
-                if (destSquare == null) {
+                if (destSquare == null || (destSquare.isOccupied() && destSquare.getPiece().getAlliance() == piece.getAlliance())) {
                     continue;
                 }
 
