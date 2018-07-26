@@ -124,8 +124,7 @@ public class MoveAnalyser {
                 !MoveUtils.isRegularPawnMove(pawn, moveVector, destSquare)) {
 
             if (isEnPassantMove(pawn, moveVector, destSquare)) {
-                Pawn capturedPawn = (Pawn) position.getEnPassantTarget().getPiece();
-                analysisBuilder.setIsEnPassant(true).setCapturedPawn(capturedPawn);
+                analysisBuilder.setIsEnPassant(true).setEnPassantSquare(position.getEnPassantTarget());
 
             } else {
                 analysisBuilder.setIsLegal(false);

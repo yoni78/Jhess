@@ -22,20 +22,12 @@ public class Square {
         this.piece = piece;
         this.rank = rank;
         this.file = file;
-
-        if (piece != null){
-            piece.setSquare(this);
-        }
     }
 
     public Square(Square square) {
         rank = square.getRank();
         file = square.getFile();
         piece = square.getPiece() != null ? square.getPiece().getCopy() : null;
-
-        if (piece != null) {
-            piece.setSquare(this);
-        }
     }
 
     public Piece getPiece() {

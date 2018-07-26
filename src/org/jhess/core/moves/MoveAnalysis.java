@@ -15,14 +15,14 @@ public class MoveAnalysis {
     private final Square promotionSquare;
 
     private final boolean isEnPassant;
-    private final Piece capturedPawn;
+    private final Square enPassantSquare;
 
     private final boolean isCheck;
 
     public MoveAnalysis(boolean isValid,
                  boolean isCastlingMove, Square rookToCastleSquare,
                  boolean isPromotionMove, Square promotionSquare,
-                 boolean isEnPassant, Piece capturedPawn,
+                 boolean isEnPassant, Square enPassantSquare,
                  boolean isCheck) {
 
         this.isLegal = isValid;
@@ -31,7 +31,7 @@ public class MoveAnalysis {
         this.isPromotionMove = isPromotionMove;
         this.promotionSquare = promotionSquare;
         this.isEnPassant = isEnPassant;
-        this.capturedPawn = capturedPawn;
+        this.enPassantSquare = enPassantSquare;
         this.isCheck = isCheck;
     }
 
@@ -59,8 +59,8 @@ public class MoveAnalysis {
         return isEnPassant;
     }
 
-    public Piece getCapturedPawn() {
-        return capturedPawn;
+    public Square getEnPassantSquare() {
+        return enPassantSquare;
     }
 
     public boolean isCheck() {

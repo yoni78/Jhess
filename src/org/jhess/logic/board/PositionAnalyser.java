@@ -39,14 +39,14 @@ public class PositionAnalyser {
     public boolean isCheck(Alliance playerToCheck) {
 
         MoveAnalyser moveAnalyser = new MoveAnalyser(position);
-        King king = BoardUtils.getKing(position, playerToCheck);
+        Square kingSquare = BoardUtils.getKing(position, playerToCheck);
 
         List<MoveVector> possibleMoves = PieceUtils.getRookMoves();
         possibleMoves.addAll(PieceUtils.getBishopMoves());
         possibleMoves.addAll(PieceUtils.getKnightMoves());
 
         for (MoveVector possibleMove : possibleMoves) {
-            Square destSquare = BoardUtils.addMoveToSquare(position, king.getSquare(), possibleMove);
+            Square destSquare = BoardUtils.addMoveToSquare(position, kingSquare, possibleMove);
 
             if (destSquare == null || destSquare.getPiece() == null || destSquare.getPiece().getAlliance() == playerToCheck) {
                 continue;
@@ -82,23 +82,25 @@ public class PositionAnalyser {
         MoveAnalyser moveAnalyser = new MoveAnalyser(position);
 
         // Get all the pieces of the player
-        List<Piece> pieces = BoardUtils.getPieces(position, position.getPlayerToMove());
+        List<Square> pieceSquares = BoardUtils.getPieces(position, position.getPlayerToMove());
 
         // If moving any of them leads to a position without check, then it's not mate
-        for (Piece piece : pieces) {
+        for (Square square: pieceSquares) {
+            Piece piece = square.getPiece();
+
             for (MoveVector moveVector : piece.getMoveList()) {
 
-                Square destSquare = BoardUtils.addMoveToSquare(position, piece.getSquare(), moveVector);
+                Square destSquare = BoardUtils.addMoveToSquare(position, square, moveVector);
                 if (destSquare == null || (destSquare.isOccupied() && destSquare.getPiece().getAlliance() == piece.getAlliance())) {
                     continue;
                 }
 
-                MoveAnalysis moveAnalysis = moveAnalyser.analyseMove(piece.getSquare(), destSquare);
+                MoveAnalysis moveAnalysis = moveAnalyser.analyseMove(square, destSquare);
                 if (!moveAnalysis.isLegal()) {
                     continue;
                 }
 
-                Board newPosition = new MovePerformer(position).makeMove(piece.getSquare(), destSquare, null);
+                Board newPosition = new MovePerformer(position).makeMove(square, destSquare, null);
 
                 if (!new PositionAnalyser(newPosition).isCheck()) {
                     return false;
@@ -122,17 +124,19 @@ public class PositionAnalyser {
         MoveAnalyser moveAnalyser = new MoveAnalyser(position);
 
         // Get all the pieces of the player
-        List<Piece> pieces = BoardUtils.getPieces(position, position.getPlayerToMove());
+        List<Square> pieceSquares = BoardUtils.getPieces(position, position.getPlayerToMove());
 
         // If there is a legal move for the player, the it's not stalemate
-        for (Piece piece : pieces) {
+        for (Square square : pieceSquares) {
+            Piece piece = square.getPiece();
+
             for (MoveVector moveVector : piece.getMoveList()) {
-                Square destSquare = BoardUtils.addMoveToSquare(position, piece.getSquare(), moveVector);
+                Square destSquare = BoardUtils.addMoveToSquare(position, square, moveVector);
                 if (destSquare == null) {
                     continue;
                 }
 
-                MoveAnalysis moveAnalysis = moveAnalyser.analyseMove(piece.getSquare(), destSquare);
+                MoveAnalysis moveAnalysis = moveAnalyser.analyseMove(square, destSquare);
                 if (moveAnalysis.isLegal()) {
                     return false;
                 }

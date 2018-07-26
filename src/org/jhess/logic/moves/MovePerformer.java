@@ -41,7 +41,7 @@ public class MovePerformer {
      */
     private Board enPassantMove(Board board, MoveAnalysis moveAnalysis) {
         Board newBoard = new BoardFactory().copyBoard(board);
-        Square capturePawnSquare = moveAnalysis.getCapturedPawn().getSquare();
+        Square capturePawnSquare = moveAnalysis.getEnPassantSquare();
         Square newSquare = newBoard.getSquares()[capturePawnSquare.getRank()][capturePawnSquare.getFile()];
 
         newSquare.setPiece(null);
@@ -128,7 +128,6 @@ public class MovePerformer {
      * @return The square which can be taken by en passant.
      */
     private Square setEnPassantTarget(Square srcSquare, Square destSquare, Board newPosition){
-        // TODO: 2018-07-21 Set it to null if the opportunity has passed
         Piece piece = srcSquare.getPiece();
         MoveVector moveVector = new MoveVector(srcSquare, destSquare);
 
@@ -202,8 +201,6 @@ public class MovePerformer {
         newDest.setPiece(pieceToMove);
         newSrc.setPiece(null);
 
-        pieceToMove.setSquare(newDest);
-
         BoardBuilder boardBuilder = new BoardFactory().getBoardBuilder(board);
         boardBuilder.setSquares(squares);
 
@@ -218,7 +215,6 @@ public class MovePerformer {
      * @return Returns the new position, or null if the move is illegal.
      */
     public Board makeMove(Square srcSquare, Square destSquare, PieceType pieceToPromoteTo) {
-        // TODO: 2018-07-21 Fix castling
         MoveAnalyser moveAnalyser = new MoveAnalyser(currentPosition);
         MoveAnalysis moveAnalysis = moveAnalyser.analyseMove(srcSquare, destSquare);
 

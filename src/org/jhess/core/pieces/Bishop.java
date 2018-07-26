@@ -36,7 +36,7 @@ public class Bishop extends Piece {
 
     @Override
     public Piece getCopy() {
-        Bishop copy = new Bishop(alliance, square);
+        Bishop copy = new Bishop(alliance);
         copy.setFirstMove(isFirstMove);
         return copy;
     }

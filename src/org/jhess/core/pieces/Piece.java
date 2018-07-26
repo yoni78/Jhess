@@ -9,13 +9,11 @@ import java.util.List;
 public abstract class Piece {
 
     protected final Alliance alliance;
-    protected boolean isFirstMove = true;
-    protected Square square; // TODO: 2018-07-21 Remove
+    protected boolean isFirstMove = true; // TODO: 2018-07-26 Delete?
     protected final PieceType pieceType;
 
     public Piece(Alliance alliance, Square square, PieceType pieceType) {
         this.alliance = alliance;
-        this.square = square;
         this.pieceType = pieceType;
     }
 
@@ -37,14 +35,6 @@ public abstract class Piece {
 
     public void setFirstMove(boolean firstMove) {
         isFirstMove = firstMove;
-    }
-
-    public Square getSquare() {
-        return square;
-    }
-
-    public void setSquare(Square square) {
-        this.square = square;
     }
 
     public PieceType getPieceType() {

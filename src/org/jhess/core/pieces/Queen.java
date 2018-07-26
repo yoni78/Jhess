@@ -37,7 +37,7 @@ public class Queen extends Piece {
 
     @Override
     public Piece getCopy() {
-        Queen copy = new Queen(alliance, square);
+        Queen copy = new Queen(alliance);
         copy.setFirstMove(isFirstMove);
         return copy;
     }

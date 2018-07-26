@@ -45,15 +45,14 @@ public final class BoardUtils {
      *
      * @param board    The game board.
      * @param alliance The alliance of the king.
-     * @return The king of the given alliance.
+     * @return The square of the king of the given alliance.
      */
-    public static King getKing(Board board, Alliance alliance) {
+    public static Square getKing(Board board, Alliance alliance) {
 
         return Arrays.stream(board.getSquares())
                 .flatMap(Arrays::stream)
                 .filter(square -> hasKing(square, alliance))
                 .findFirst()
-                .map(square -> (King) square.getPiece())
                 .orElse(null);
     }
 
@@ -76,17 +75,15 @@ public final class BoardUtils {
     }
 
     /**
-     * Gets all of the pieces of the given player.
+     * Gets all of the squares which have pieces of the given player on them.
      * @param board The game board.
      * @param player The player.
      * @return The player's pieces.
      */
-    public static List<Piece> getPieces(Board board, Alliance player){
+    public static List<Square> getPieces(Board board, Alliance player){
         return Arrays.stream(board.getSquares())
                 .flatMap(Arrays::stream)
-                .filter(square -> square.getPiece() != null)
                 .filter(square -> square.getPiece()!= null && square.getPiece().getAlliance() == player)
-                .map(Square::getPiece)
                 .collect(Collectors.toList());
     }
 

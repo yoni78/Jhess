@@ -1,7 +1,6 @@
 package org.jhess.core.moves;
 
 import org.jhess.core.board.Square;
-import org.jhess.core.pieces.Piece;
 
 public class MoveAnalysisBuilder {
 
@@ -11,7 +10,7 @@ public class MoveAnalysisBuilder {
     private boolean isPromotionMove = false;
     private Square promotionSquare = null;
     private boolean isEnPassant;
-    private Piece capturedPawn;
+    private Square enPassantSquare;
     private boolean isCheck;
 
     public MoveAnalysisBuilder setIsLegal(boolean isLegal) {
@@ -44,8 +43,8 @@ public class MoveAnalysisBuilder {
         return this;
     }
 
-    public MoveAnalysisBuilder setCapturedPawn(Piece capturedPawn) {
-        this.capturedPawn = capturedPawn;
+    public MoveAnalysisBuilder setEnPassantSquare(Square enPassantSquare) {
+        this.enPassantSquare = enPassantSquare;
         return this;
     }
 
@@ -55,6 +54,6 @@ public class MoveAnalysisBuilder {
     }
 
     public MoveAnalysis createMoveValidation() {
-        return new MoveAnalysis(isLegal, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, capturedPawn, isCheck);
+        return new MoveAnalysis(isLegal, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, enPassantSquare, isCheck);
     }
 }
