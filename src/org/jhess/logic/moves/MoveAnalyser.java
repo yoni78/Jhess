@@ -73,6 +73,10 @@ public class MoveAnalyser {
             }
         }
 
+        if(destSquare.isOccupied()){
+            analysisBuilder.setCaptureMove(true);
+        }
+
         return analysisBuilder.createMoveValidation();
     }
 
@@ -124,7 +128,7 @@ public class MoveAnalyser {
                 !MoveUtils.isRegularPawnMove(pawn, moveVector, destSquare)) {
 
             if (isEnPassantMove(pawn, moveVector, destSquare)) {
-                analysisBuilder.setIsEnPassant(true).setEnPassantSquare(position.getEnPassantTarget());
+                analysisBuilder.setIsEnPassant(true).setEnPassantSquare(position.getEnPassantTarget()).setCaptureMove(true);
 
             } else {
                 analysisBuilder.setIsLegal(false);

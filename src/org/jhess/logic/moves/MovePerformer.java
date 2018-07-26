@@ -12,7 +12,6 @@ import org.jhess.logic.board.BoardUtils;
 
 import java.util.Objects;
 
-// TODO: 2018-07-20 Update the player to move, move counters, and flags.
 public class MovePerformer {
 
     private final Board currentPosition;
@@ -121,7 +120,7 @@ public class MovePerformer {
     }
 
     /**
-     *
+     * Sets the square which en-passant can be performed on.
      * @param srcSquare The source square of the move.
      * @param destSquare The destination square of the move.
      * @param newPosition The new position after the move.
@@ -141,12 +140,29 @@ public class MovePerformer {
     }
 
     /**
+     * Sets the half move clock.
+     * @param newPosition The new position after the move.
+     * @param playerToMove The player to move in the new position.
+     * @param srcSquare The source square of the move.
+     * @param moveAnalysis The analysis of the move.
+     * @return The number of half moves.
+     */
+    private int setHalfMoveClock(Board newPosition, Alliance playerToMove, Square srcSquare, MoveAnalysis moveAnalysis){
+
+        // If the move is an irrevocable move, reset the counter
+        if(srcSquare.getPiece().getPieceType() == PieceType.PAWN || moveAnalysis.isCaptureMove()){
+            return 0;
+        }
+        return newPosition.getHalfMoveClock() + 1;
+    }
+
+    /**
      * Sets all of the relevant flags for the new position.
      *
      * @param newPosition The current position.
      * @return The new position with it's flags set.
      */
-    private Board setPositionFlags(Board newPosition, Square srcSquare, Square destSquare) {
+    private Board setPositionFlags(Board newPosition, Square srcSquare, Square destSquare, MoveAnalysis moveAnalysis) {
         BoardBuilder boardBuilder = new BoardFactory().getBoardBuilder(newPosition);
 
         // Switch player
@@ -158,7 +174,7 @@ public class MovePerformer {
         boardBuilder.setFullMoveNumber(fullMoveNumber);
 
         // Half move clock
-        int halfMoveClock = playerToMove == Alliance.WHITE ? newPosition.getHalfMoveClock() + 1 : newPosition.getHalfMoveClock(); // TODO: 2018-07-21 Should be reset after an irrevocable move (pawn moves or captures)
+        int halfMoveClock = setHalfMoveClock(newPosition, playerToMove, srcSquare, moveAnalysis);
         boardBuilder.setHalfMoveClock(halfMoveClock);
 
         // White can castle kingside
@@ -225,7 +241,7 @@ public class MovePerformer {
         Board newPosition = movePiece(currentPosition, srcSquare, destSquare);
         newPosition = handleSpecialMoves(newPosition.getPlayerToMove(), newPosition, moveAnalysis, pieceToPromoteTo);
 
-        newPosition = setPositionFlags(newPosition, srcSquare, destSquare);
+        newPosition = setPositionFlags(newPosition, srcSquare, destSquare, moveAnalysis);
 
         return newPosition;
     }

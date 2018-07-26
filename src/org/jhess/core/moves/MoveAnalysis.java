@@ -1,12 +1,13 @@
 package org.jhess.core.moves;
 
 import org.jhess.core.board.Square;
-import org.jhess.core.pieces.Piece;
 
 
 public class MoveAnalysis {
     // TODO: 2018-07-21 Add isCaptureMove
     private final boolean isLegal;
+
+    private final boolean isCaptureMove;
 
     private final boolean isCastlingMove;
     private final Square rookToCastleSquare;
@@ -20,12 +21,13 @@ public class MoveAnalysis {
     private final boolean isCheck;
 
     public MoveAnalysis(boolean isValid,
-                 boolean isCastlingMove, Square rookToCastleSquare,
-                 boolean isPromotionMove, Square promotionSquare,
-                 boolean isEnPassant, Square enPassantSquare,
-                 boolean isCheck) {
+                        boolean isCaptureMove, boolean isCastlingMove, Square rookToCastleSquare,
+                        boolean isPromotionMove, Square promotionSquare,
+                        boolean isEnPassant, Square enPassantSquare,
+                        boolean isCheck) {
 
         this.isLegal = isValid;
+        this.isCaptureMove = isCaptureMove;
         this.isCastlingMove = isCastlingMove;
         this.rookToCastleSquare = rookToCastleSquare;
         this.isPromotionMove = isPromotionMove;
@@ -37,6 +39,10 @@ public class MoveAnalysis {
 
     public boolean isLegal() {
         return isLegal;
+    }
+
+    public boolean isCaptureMove() {
+        return isCaptureMove;
     }
 
     public boolean isCastlingMove() {

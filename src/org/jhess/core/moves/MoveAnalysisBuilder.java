@@ -5,6 +5,7 @@ import org.jhess.core.board.Square;
 public class MoveAnalysisBuilder {
 
     private boolean isLegal = false;
+    private boolean isCaptureMove = false;
     private boolean isCastlingMove = false;
     private Square rookToCastleSquare = null;
     private boolean isPromotionMove = false;
@@ -15,6 +16,11 @@ public class MoveAnalysisBuilder {
 
     public MoveAnalysisBuilder setIsLegal(boolean isLegal) {
         this.isLegal = isLegal;
+        return this;
+    }
+
+    public MoveAnalysisBuilder setCaptureMove(boolean captureMove) {
+        this.isCaptureMove = captureMove;
         return this;
     }
 
@@ -54,6 +60,6 @@ public class MoveAnalysisBuilder {
     }
 
     public MoveAnalysis createMoveValidation() {
-        return new MoveAnalysis(isLegal, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, enPassantSquare, isCheck);
+        return new MoveAnalysis(isLegal, isCaptureMove, isCastlingMove, rookToCastleSquare, isPromotionMove, promotionSquare, isEnPassant, enPassantSquare, isCheck);
     }
 }
