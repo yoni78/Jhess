@@ -1,10 +1,8 @@
 package org.jhess.logic.board;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Game;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
-import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.King;
@@ -86,9 +84,10 @@ public class PositionAnalyser {
         // Get all the pieces of the player
         List<Piece> pieces = BoardUtils.getPieces(position, position.getPlayerToMove());
 
-        // If moving any of them leads to a position without check, the it's not mate
+        // If moving any of them leads to a position without check, then it's not mate
         for (Piece piece : pieces) {
             for (MoveVector moveVector : piece.getMoveList()) {
+
                 Square destSquare = BoardUtils.addMoveToSquare(position, piece.getSquare(), moveVector);
                 if (destSquare == null || (destSquare.isOccupied() && destSquare.getPiece().getAlliance() == piece.getAlliance())) {
                     continue;

@@ -109,17 +109,15 @@ public class MovePerformer {
 
     /**
      * Sets the relevant castling flag.
-     * @param newPosition The new position after the move was played.
      * @param srcSquare The source square of the move.
      * @param rookFile The file of the rook the set the flag to (king or queen side).
      * @return Whether the player can castle to this side after this move.
      */
-    private boolean setCastlingFlag(Board newPosition, Square srcSquare, int rookFile) {
+    private boolean setCastlingFlag(Square srcSquare, int rookFile) {
         Piece playedPiece = srcSquare.getPiece();
         PieceType playedPieceType = playedPiece.getPieceType();
 
-        return newPosition.getPlayerToMove() != playedPiece.getAlliance() ||
-                (playedPieceType != PieceType.KING && (playedPieceType != PieceType.ROOK || srcSquare.getFile() != rookFile));
+        return !(playedPieceType == PieceType.KING || playedPieceType == PieceType.ROOK && srcSquare.getFile() == rookFile);
     }
 
     /**
@@ -165,19 +163,19 @@ public class MovePerformer {
         boardBuilder.setHalfMoveClock(halfMoveClock);
 
         // White can castle kingside
-        boolean whiteCanCastleKingSide = setCastlingFlag(newPosition, srcSquare, 7);
+        boolean whiteCanCastleKingSide = setCastlingFlag(srcSquare, 7);
         boardBuilder.setWhiteCanCastleKingSide(whiteCanCastleKingSide);
 
         // White can castle queenside
-        boolean whiteCanCastleQueenSide = setCastlingFlag(newPosition, srcSquare, 0);
+        boolean whiteCanCastleQueenSide = setCastlingFlag(srcSquare, 0);
         boardBuilder.setWhiteCanCastleQueenSide(whiteCanCastleQueenSide);
 
         // Black can castle kingside
-        boolean blackCanCastleKingSide = setCastlingFlag(newPosition, srcSquare, 7);
+        boolean blackCanCastleKingSide = setCastlingFlag(srcSquare, 7);
         boardBuilder.setBlackCanCastleKingSide(blackCanCastleKingSide);
 
         // Black can castle queenside
-        boolean blackCanCastleQueenSide = setCastlingFlag(newPosition, srcSquare, 0);
+        boolean blackCanCastleQueenSide = setCastlingFlag(srcSquare, 0);
         boardBuilder.setBlackCanCastleQueenSide(blackCanCastleQueenSide);
 
         // Set en passant target
