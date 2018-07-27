@@ -69,7 +69,7 @@ public final class BoardUtils {
         int file = square.getFile() + moveVector.getFileToAdvance();
 
         if (rank < 0 || rank > 7 || file < 0 || file > 7) {
-            return null; // TODO: 2018-05-17 throw an exception?
+            return null;
         }
 
         return board.getSquares()[rank][file];
@@ -117,5 +117,17 @@ public final class BoardUtils {
     public static Square getSquareByPgn(Board board, String squarePgn) {
         Square square = new PgnConverter().pgnToSquare(squarePgn);
         return board.getSquares()[square.getRank()][square.getFile()];
+    }
+
+    /**
+     * Checks if the pawn got to the last rank (and should subsequently be promoted).
+     *
+     * @param destSquare   The destination square of the move.
+     * @param pawnAlliance The alliance of the pawn.
+     * @return If the pawn got to the last rank.
+     */
+    public static boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
+        return (pawnAlliance == Alliance.WHITE && destSquare.getRank() == 7) ||
+                (pawnAlliance == Alliance.BLACK && destSquare.getRank() == 0);
     }
 }

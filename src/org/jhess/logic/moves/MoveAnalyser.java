@@ -132,7 +132,7 @@ public class MoveAnalyser {
             }
         }
 
-        if (isPawnOnLastRank(destSquare, pawn.getAlliance())) {
+        if (BoardUtils.isPawnOnLastRank(destSquare, pawn.getAlliance())) {
             analysisBuilder.setIsPromotionMove(true).setPromotionSquare(destSquare);
         }
     }
@@ -182,7 +182,7 @@ public class MoveAnalyser {
      * @return If the moveVector is an En Passant.
      */
     private boolean isEnPassantMove(Piece pawn, MoveVector moveVector, Square destSquare) {
-        return isLegalPawnCaptureMove(pawn, moveVector, destSquare, true) && position.getEnPassantTarget() != null && position.getEnPassantTarget().equals(destSquare); // TODO: 2018-07-20 TEST (a possible bug was observed)!
+        return isLegalPawnCaptureMove(pawn, moveVector, destSquare, true) && position.getEnPassantTarget() != null && position.getEnPassantTarget().equals(destSquare);
     }
 
     /**
@@ -204,19 +204,6 @@ public class MoveAnalyser {
         }
 
         return false;
-    }
-
-    /**
-     * Checks if the pawn got to the last rank (and should subsequently be promoted)
-     *
-     * @param destSquare   The destination square of the move.
-     * @param pawnAlliance The alliance of the pawn.
-     * @return If the pawn got to the last rank.
-     */
-    private boolean isPawnOnLastRank(Square destSquare, Alliance pawnAlliance) {
-        // TODO: 2018-07-21 Move to a different class?
-        return (pawnAlliance == Alliance.WHITE && destSquare.getRank() == 7) ||
-                (pawnAlliance == Alliance.BLACK && destSquare.getRank() == 0);
     }
 
     /**

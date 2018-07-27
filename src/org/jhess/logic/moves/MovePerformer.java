@@ -75,13 +75,17 @@ public class MovePerformer {
                 return board;
         }
 
-        Board newBoard = new BoardFactory().copyBoard(board);
+        Square[][] squares = board.getSquares();
         Square promotionSquare = moveAnalysis.getPromotionSquare();
-        Square newSquare = newBoard.getSquares()[promotionSquare.getRank()][promotionSquare.getFile()];
+
+        Square newSquare = squares[promotionSquare.getRank()][promotionSquare.getFile()];
 
         newSquare.setPiece(newPiece);
 
-        return newBoard;
+        BoardBuilder boardBuilder = new BoardFactory().getBoardBuilder(board);
+        boardBuilder.setSquares(squares);
+
+        return boardBuilder.createBoard();
     }
 
     /**
@@ -146,12 +150,11 @@ public class MovePerformer {
      * Sets the half move clock.
      *
      * @param newPosition  The new position after the move.
-     * @param playerToMove The player to move in the new position.
      * @param srcSquare    The source square of the move.
      * @param moveAnalysis The analysis of the move.
      * @return The number of half moves.
      */
-    private int setHalfMoveClock(Board newPosition, Alliance playerToMove, Square srcSquare, MoveAnalysis moveAnalysis) {
+    private int setHalfMoveClock(Board newPosition, Square srcSquare, MoveAnalysis moveAnalysis) {
 
         // If the move is an irrevocable move, reset the counter
         if (srcSquare.getPiece().getPieceType() == PieceType.PAWN || moveAnalysis.isCaptureMove()) {
@@ -178,7 +181,7 @@ public class MovePerformer {
         boardBuilder.setFullMoveNumber(fullMoveNumber);
 
         // Half move clock
-        int halfMoveClock = setHalfMoveClock(newPosition, playerToMove, srcSquare, moveAnalysis);
+        int halfMoveClock = setHalfMoveClock(newPosition, srcSquare, moveAnalysis);
         boardBuilder.setHalfMoveClock(halfMoveClock);
 
         // White can castle kingside

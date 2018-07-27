@@ -30,6 +30,8 @@ public class PromotionDialog extends JDialog {
         WindowUtils.centerWindow(this);
 
         initPanel(alliance);
+
+        setVisible(true);
     }
 
     private void initPanel(Alliance alliance) {
