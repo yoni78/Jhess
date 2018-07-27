@@ -36,8 +36,6 @@ public class Rook extends Piece {
 
     @Override
     public Piece getCopy() {
-        Rook copy = new Rook(alliance);
-        copy.setFirstMove(isFirstMove);
-        return copy;
+        return new Rook(alliance);
     }
 }

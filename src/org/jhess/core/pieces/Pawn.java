@@ -31,8 +31,6 @@ public class Pawn extends Piece {
 
     @Override
     public Piece getCopy() {
-        Pawn copy = new Pawn(alliance);
-        copy.setFirstMove(isFirstMove);
-        return copy;
+        return new Pawn(alliance);
     }
 }

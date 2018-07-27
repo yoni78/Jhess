@@ -9,7 +9,6 @@ import java.util.List;
 public abstract class Piece {
 
     protected final Alliance alliance;
-    protected boolean isFirstMove = true; // TODO: 2018-07-26 Delete?
     protected final PieceType pieceType;
 
     public Piece(Alliance alliance, Square square, PieceType pieceType) {
@@ -28,14 +27,6 @@ public abstract class Piece {
     public abstract List<MoveVector> getMoveList();
 
     public abstract Piece getCopy();
-
-    public boolean isFirstMove() {
-        return isFirstMove;
-    }
-
-    public void setFirstMove(boolean firstMove) {
-        isFirstMove = firstMove;
-    }
 
     public PieceType getPieceType() {
         return pieceType;

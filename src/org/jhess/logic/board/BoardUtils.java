@@ -5,7 +5,6 @@ import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.King;
-import org.jhess.core.pieces.Piece;
 
 import java.util.Arrays;
 import java.util.List;

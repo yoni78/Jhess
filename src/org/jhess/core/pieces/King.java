@@ -37,8 +37,6 @@ public class King extends Piece {
 
     @Override
     public Piece getCopy() {
-        King copy = new King(alliance);
-        copy.setFirstMove(isFirstMove);
-        return copy;
+        return new King(alliance);
     }
 }

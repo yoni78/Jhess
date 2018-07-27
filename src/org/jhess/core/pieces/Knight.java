@@ -38,8 +38,6 @@ public class Knight extends Piece {
 
     @Override
     public Piece getCopy() {
-        Knight copy = new Knight(alliance);
-        copy.setFirstMove(isFirstMove);
-        return copy;
+        return new Knight(alliance);
     }
 }

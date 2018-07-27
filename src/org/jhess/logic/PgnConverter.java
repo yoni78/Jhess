@@ -114,7 +114,7 @@ public class PgnConverter {
      * Serializers a Square to PGN format.
      *
      * @param square The piece to serialize.
-     * @return The strnig which represents the square.
+     * @return The string which represents the square.
      */
     public String squareToPgn(Square square) {
         char rank = (char) (square.getRank() + 64);

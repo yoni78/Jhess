@@ -12,42 +12,6 @@ import java.util.List;
  */
 public class BoardFactory {
 
-    /**
-     * Generates a list of all of the pieces a player starts with except the pawns.
-     *
-     * @param alliance The alliance of the pieces.
-     * @return A list of all the pieces with the given alliance.
-     */
-    private List<Piece> generatePieces(Alliance alliance) {
-        List<Piece> pieces = new ArrayList<>();
-
-        pieces.add(new Rook(alliance));
-        pieces.add(new Knight(alliance));
-        pieces.add(new Bishop(alliance));
-        pieces.add(new Queen(alliance));
-        pieces.add(new King(alliance));
-        pieces.add(new Bishop(alliance));
-        pieces.add(new Knight(alliance));
-        pieces.add(new Rook(alliance));
-
-        return pieces;
-    }
-
-    /**
-     * Generates a list of pawns that a player starts with.
-     *
-     * @param alliance The alliance of the pawns.
-     * @return A list eight pawns with the given alliance.
-     */
-    private List<Piece> generatePawns(Alliance alliance) {
-        List<Piece> pieces = new ArrayList<>();
-
-        for (int i = 0; i < 8; i++) {
-            pieces.add(new Pawn(alliance));
-        }
-
-        return pieces;
-    }
 
     /**
      * Generates the squares of a board from a matrix of pieces.

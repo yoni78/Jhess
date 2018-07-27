@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.jhess.core.moves.MoveVector.*;
-import static org.jhess.core.moves.MoveVector.LEFT;
 
 public class Queen extends Piece {
 
@@ -37,8 +36,6 @@ public class Queen extends Piece {
 
     @Override
     public Piece getCopy() {
-        Queen copy = new Queen(alliance);
-        copy.setFirstMove(isFirstMove);
-        return copy;
+        return new Queen(alliance);
     }
 }

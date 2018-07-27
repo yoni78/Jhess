@@ -3,7 +3,7 @@ package org.jhess.core.board;
 import org.jhess.core.Alliance;
 import org.jhess.logic.board.BoardUtils;
 
-// TODO: 2018-07-13 Distinguish between "real" and "imaginary" positions (like when calcuating mate)
+// TODO: 2018-07-13 Distinguish between "real" and "imaginary" positions (like when calculating mate)
 public class Board {
     private final Square[][] squares;
     private final Alliance playerToMove;

@@ -5,7 +5,6 @@ import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
-import org.jhess.core.pieces.King;
 import org.jhess.core.pieces.Piece;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;

@@ -1,7 +1,5 @@
 package org.jhess.logic.board;
 
-import org.jhess.core.Game;
-import org.jhess.core.board.Board;
 import org.jhess.core.board.BoardFactory;
 import org.junit.jupiter.api.Test;
 

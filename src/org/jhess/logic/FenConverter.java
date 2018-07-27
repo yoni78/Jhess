@@ -1,7 +1,6 @@
 package org.jhess.logic;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
 
@@ -12,7 +11,7 @@ public class FenConverter {
 
     public static final String startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    private String fen;
+    private final String fen;
 
     public FenConverter(String fen) {
         this.fen = fen;
