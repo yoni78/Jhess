@@ -9,6 +9,7 @@ import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveVector;
 import org.jhess.core.pieces.*;
 import org.jhess.logic.board.BoardUtils;
+import org.jhess.logic.pieces.PieceUtils;
 
 import java.util.Objects;
 
@@ -108,30 +109,32 @@ public class MovePerformer {
 
     /**
      * Sets the relevant castling flag.
+     *
      * @param srcSquare The source square of the move.
-     * @param rookFile The file of the rook the set the flag to (king or queen side).
+     * @param rookFile  The file of the rook the set the flag to (king or queen side).
      * @return Whether the player can castle to this side after this move.
      */
-    private boolean setCastlingFlag(Square srcSquare, int rookFile) {
+    private boolean setCastlingFlag(Alliance playerToSetTheFlagFor, Square srcSquare, int rookFile) {
         Piece playedPiece = srcSquare.getPiece();
-        PieceType playedPieceType = playedPiece.getPieceType();
 
-        return !(playedPieceType == PieceType.KING || playedPieceType == PieceType.ROOK && srcSquare.getFile() == rookFile);
+        return !(playedPiece.getAlliance() == playerToSetTheFlagFor &&
+                (PieceUtils.isKing(playedPiece) || PieceUtils.isRook(playedPiece) && srcSquare.getFile() == rookFile));
     }
 
     /**
      * Sets the square which en-passant can be performed on.
-     * @param srcSquare The source square of the move.
-     * @param destSquare The destination square of the move.
+     *
+     * @param srcSquare   The source square of the move.
+     * @param destSquare  The destination square of the move.
      * @param newPosition The new position after the move.
      * @return The square which can be taken by en passant.
      */
-    private Square setEnPassantTarget(Square srcSquare, Square destSquare, Board newPosition){
+    private Square setEnPassantTarget(Square srcSquare, Square destSquare, Board newPosition) {
         Piece piece = srcSquare.getPiece();
         MoveVector moveVector = new MoveVector(srcSquare, destSquare);
 
         Square enPassantTarget = null;
-        if(piece.getPieceType() == PieceType.PAWN && MoveUtils.isPawnDoubleMove(srcSquare, piece, moveVector)){
+        if (piece.getPieceType() == PieceType.PAWN && MoveUtils.isPawnDoubleMove(srcSquare, piece, moveVector)) {
             int enPassantRank = piece.getAlliance() == Alliance.WHITE ? destSquare.getRank() - 1 : destSquare.getRank() + 1;
             enPassantTarget = newPosition.getSquares()[enPassantRank][destSquare.getFile()];
         }
@@ -141,16 +144,17 @@ public class MovePerformer {
 
     /**
      * Sets the half move clock.
-     * @param newPosition The new position after the move.
+     *
+     * @param newPosition  The new position after the move.
      * @param playerToMove The player to move in the new position.
-     * @param srcSquare The source square of the move.
+     * @param srcSquare    The source square of the move.
      * @param moveAnalysis The analysis of the move.
      * @return The number of half moves.
      */
-    private int setHalfMoveClock(Board newPosition, Alliance playerToMove, Square srcSquare, MoveAnalysis moveAnalysis){
+    private int setHalfMoveClock(Board newPosition, Alliance playerToMove, Square srcSquare, MoveAnalysis moveAnalysis) {
 
         // If the move is an irrevocable move, reset the counter
-        if(srcSquare.getPiece().getPieceType() == PieceType.PAWN || moveAnalysis.isCaptureMove()){
+        if (srcSquare.getPiece().getPieceType() == PieceType.PAWN || moveAnalysis.isCaptureMove()) {
             return 0;
         }
         return newPosition.getHalfMoveClock() + 1;
@@ -178,19 +182,19 @@ public class MovePerformer {
         boardBuilder.setHalfMoveClock(halfMoveClock);
 
         // White can castle kingside
-        boolean whiteCanCastleKingSide = setCastlingFlag(srcSquare, 7);
+        boolean whiteCanCastleKingSide = setCastlingFlag(Alliance.WHITE, srcSquare, 7);
         boardBuilder.setWhiteCanCastleKingSide(whiteCanCastleKingSide);
 
         // White can castle queenside
-        boolean whiteCanCastleQueenSide = setCastlingFlag(srcSquare, 0);
+        boolean whiteCanCastleQueenSide = setCastlingFlag(Alliance.WHITE, srcSquare, 0);
         boardBuilder.setWhiteCanCastleQueenSide(whiteCanCastleQueenSide);
 
         // Black can castle kingside
-        boolean blackCanCastleKingSide = setCastlingFlag(srcSquare, 7);
+        boolean blackCanCastleKingSide = setCastlingFlag(Alliance.BLACK, srcSquare, 7);
         boardBuilder.setBlackCanCastleKingSide(blackCanCastleKingSide);
 
         // Black can castle queenside
-        boolean blackCanCastleQueenSide = setCastlingFlag(srcSquare, 0);
+        boolean blackCanCastleQueenSide = setCastlingFlag(Alliance.BLACK, srcSquare, 0);
         boardBuilder.setBlackCanCastleQueenSide(blackCanCastleQueenSide);
 
         // Set en passant target

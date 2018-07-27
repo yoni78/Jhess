@@ -6,7 +6,6 @@ import org.jhess.core.board.Square;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.moves.MoveAnalysisBuilder;
 import org.jhess.core.moves.MoveVector;
-import org.jhess.core.pieces.Pawn;
 import org.jhess.core.pieces.Piece;
 import org.jhess.logic.board.BoardUtils;
 import org.jhess.logic.board.PositionAnalyser;
@@ -14,7 +13,6 @@ import org.jhess.logic.pieces.PieceUtils;
 
 import static org.jhess.core.moves.MoveVector.*;
 
-// TODO: 2018-07-07 Castle through check
 // TODO: 2018-07-20 50 move draw
 // TODO: 2018-07-20 Threefold repetition
 
@@ -47,7 +45,7 @@ public class MoveAnalyser {
             analysisBuilder.setIsLegal(false);
         }
 
-        if (!hasNoPieceInHisWay(piece, moveVector, srcSquare) && canLandOnSquare(piece, destSquare)) {
+        if (!hasNoPieceInHisWay(piece, moveVector, srcSquare) || !canLandOnSquare(piece, destSquare)) {
             analysisBuilder.setIsLegal(false);
         }
 
@@ -232,7 +230,6 @@ public class MoveAnalyser {
      * @return The rook that should participate in the castling.
      */
     private Square getCastlingRookSquare(Board board, Square destSquare, MoveVector moveVector) {
-        // TODO: 2018-07-21 Test for black
         Square rookSquare = null;
 
         // Short
@@ -255,7 +252,37 @@ public class MoveAnalyser {
      * @return Is castling possible in these conditions.
      */
     private boolean canCastle(Board board, Square rookSquare) {
-        // TODO: 2018-07-21 Test that it's not through check
+
+        // Test that the player is not in check, and that he will not pass through check
+        Square kingSquare = BoardUtils.getKing(board, board.getPlayerToMove());
+        MoveVector castleDirection = rookSquare.getFile() == 0 ? MoveVector.LEFT : MoveVector.RIGHT;
+
+        if (new PositionAnalyser(board).isCheck()){
+            return false;
+        }
+
+        for (int i = 0; i < 2; i++) {
+            MoveVector moveVector = castleDirection.extend(i);
+            Square newSquare = BoardUtils.addMoveToSquare(board, kingSquare, moveVector);
+
+            if(newSquare != null){
+                Board newPosition = MovePerformer.movePiece(board, kingSquare, newSquare);
+
+                if(new PositionAnalyser(newPosition).isCheck()){
+                    return false;
+                }
+            }
+        }
+
+        // Checks if there is a knight in the way of the rook in a queen side castling
+        if(rookSquare.getFile() == 0){
+            int knightRank = board.getPlayerToMove() == Alliance.WHITE ? 0 : 7;
+            Square knightSquare = board.getSquares()[knightRank][1];
+            if(knightSquare.isOccupied()){
+                return false;
+            }
+        }
+
         boolean whiteCanCastle = board.getPlayerToMove() == Alliance.WHITE &&
                 ((board.isWhiteCanCastleKingSide() && rookSquare.getFile() == 7) ||
                         (board.isWhiteCanCastleQueenSide() && rookSquare.getFile() == 0));

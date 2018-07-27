@@ -4,7 +4,7 @@ import org.jhess.core.board.Square;
 
 
 public class MoveAnalysis {
-    // TODO: 2018-07-21 Add isCaptureMove
+
     private final boolean isLegal;
 
     private final boolean isCaptureMove;
