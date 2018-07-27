@@ -74,6 +74,8 @@ public class PositionAnalyser {
      */
     public boolean isMate() {
 
+        // TODO: 2018-07-27 Fix (If pawn can save from mate)
+
         if (!isCheck()) {
             return false;
         }
@@ -143,5 +145,13 @@ public class PositionAnalyser {
         }
 
         return true;
+    }
+
+    /**
+     * Checks if the current is position is a draw by the fify move rule.
+     * @return If the position is a draw.
+     */
+    public boolean isFiftyMoveDraw(){
+        return position.getHalfMoveClock() >= 100;
     }
 }

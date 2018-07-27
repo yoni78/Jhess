@@ -13,7 +13,6 @@ import org.jhess.logic.pieces.PieceUtils;
 
 import static org.jhess.core.moves.MoveVector.*;
 
-// TODO: 2018-07-20 50 move draw
 // TODO: 2018-07-20 Threefold repetition
 
 public class MoveAnalyser {

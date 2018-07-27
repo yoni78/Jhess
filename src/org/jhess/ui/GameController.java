@@ -54,6 +54,7 @@ public class GameController {
                     MessageFormat.format("Checkmate! {0} is the winner.", otherPlayer.toString()));
 
             gameWindow.setVisible(false);
+            return;
 
         } else if (positionAnalyser.isStaleMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
@@ -62,6 +63,16 @@ public class GameController {
             JOptionPane.showMessageDialog(null, "Stalemate!");
 
             gameWindow.setVisible(false);
+            return;
+
+        } else if (positionAnalyser.isFiftyMoveDraw()){
+            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
+
+            drawBoard(otherPlayer);
+            JOptionPane.showMessageDialog(null, "Fifty Move Draw!");
+
+            gameWindow.setVisible(false);
+            return;
         }
 
         drawBoard(game.getPlayerToMove());
