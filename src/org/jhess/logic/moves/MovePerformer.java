@@ -249,5 +249,9 @@ public class MovePerformer {
 
         return newPosition;
     }
+
+    public Board makeMove(Square srcSquare, Square destSquare) {
+        return makeMove(srcSquare, destSquare, null);
+    }
 }
 

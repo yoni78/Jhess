@@ -130,8 +130,8 @@ public class PgnConverter {
      * @return The Square object which is represented by the string.
      */
     public Square pgnToSquare(String squareString){
-        int rank = (squareString.charAt(1) - 64);
-        int file = Integer.parseInt(squareString.substring(1));
+        int rank = Integer.parseInt(squareString.substring(1, 2)) - 1;
+        int file = (squareString.charAt(0) - 97);
 
         return new Square(rank, file);
     }

@@ -1,11 +1,7 @@
 package org.jhess.core.board;
 
-import org.jhess.core.Alliance;
 import org.jhess.core.pieces.*;
 import org.jhess.logic.FenConverter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Creates boards.

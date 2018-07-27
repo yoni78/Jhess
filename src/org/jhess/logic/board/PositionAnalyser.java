@@ -73,7 +73,7 @@ public class PositionAnalyser {
      * @return Whether the player is mated or not.
      */
     public boolean isMate() {
-        
+
         if (!isCheck()) {
             return false;
         }
@@ -99,7 +99,7 @@ public class PositionAnalyser {
                     continue;
                 }
 
-                Board newPosition = new MovePerformer(position).makeMove(square, destSquare, null);
+                Board newPosition = new MovePerformer(position).makeMove(square, destSquare);
 
                 if (!new PositionAnalyser(newPosition).isCheck()) {
                     return false;
