@@ -73,9 +73,7 @@ public class PositionAnalyser {
      * @return Whether the player is mated or not.
      */
     public boolean isMate() {
-
-        // TODO: 2018-07-27 Fix (If pawn can save from mate)
-
+        
         if (!isCheck()) {
             return false;
         }

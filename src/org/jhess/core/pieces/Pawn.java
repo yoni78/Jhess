@@ -7,7 +7,7 @@ import org.jhess.core.moves.MoveVector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jhess.core.moves.MoveVector.FORWARD;
+import static org.jhess.core.moves.MoveVector.*;
 
 public class Pawn extends Piece {
 
@@ -20,11 +20,20 @@ public class Pawn extends Piece {
         super(alliance, PieceType.PAWN);
     }
 
-    // TODO: Add capture moves(?)
     @Override
     public List<MoveVector> getMoveList() {
         List<MoveVector> moveVectorList = new ArrayList<>();
-        moveVectorList.add(FORWARD);
+
+        if(alliance == Alliance.WHITE){
+            moveVectorList.add(FORWARD);
+            moveVectorList.add(FORWARD_LEFT);
+            moveVectorList.add(FORWARD_RIGHT);
+
+        } else {
+            moveVectorList.add(BACKWARD);
+            moveVectorList.add(BACKWARD_LEFT);
+            moveVectorList.add(BACKWARD_RIGHT);
+        }
 
         return moveVectorList;
     }

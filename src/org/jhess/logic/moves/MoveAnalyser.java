@@ -120,7 +120,7 @@ public class MoveAnalyser {
      * @param destSquare The destination square of the moveVector.
      */
     private void validatePawnMove(Piece pawn, MoveVector moveVector, Square srcSquare, Square destSquare) {
-        if (!isPawnCaptureMove(pawn, moveVector, destSquare, false) &&
+        if (!isLegalPawnCaptureMove(pawn, moveVector, destSquare, false) &&
                 !MoveUtils.isPawnDoubleMove(srcSquare, pawn, moveVector) &&
                 !MoveUtils.isRegularPawnMove(pawn, moveVector, destSquare)) {
 
@@ -182,7 +182,7 @@ public class MoveAnalyser {
      * @return If the moveVector is an En Passant.
      */
     private boolean isEnPassantMove(Piece pawn, MoveVector moveVector, Square destSquare) {
-        return isPawnCaptureMove(pawn, moveVector, destSquare, true) && position.getEnPassantTarget() != null && position.getEnPassantTarget().equals(destSquare); // TODO: 2018-07-20 TEST (a possible bug was observed)!
+        return isLegalPawnCaptureMove(pawn, moveVector, destSquare, true) && position.getEnPassantTarget() != null && position.getEnPassantTarget().equals(destSquare); // TODO: 2018-07-20 TEST (a possible bug was observed)!
     }
 
     /**
@@ -193,8 +193,7 @@ public class MoveAnalyser {
      * @param destSquare The destination square of the moveVector.
      * @return If the moveVector is a pawn capture moveVector.
      */
-    private boolean isPawnCaptureMove(Piece pawn, MoveVector moveVector, Square destSquare, boolean forEnPassant) {
-        // TODO: 2018-07-21 Move to MoveUtils?
+    private boolean isLegalPawnCaptureMove(Piece pawn, MoveVector moveVector, Square destSquare, boolean forEnPassant) {
         if (forEnPassant || destSquare.isOccupied()) {
 
             if (pawn.getAlliance() == Alliance.WHITE && (moveVector.equals(FORWARD_RIGHT) || moveVector.equals(FORWARD_LEFT))) {
