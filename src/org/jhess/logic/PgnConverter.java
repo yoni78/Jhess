@@ -117,8 +117,8 @@ public class PgnConverter {
      * @return The string which represents the square.
      */
     public String squareToPgn(Square square) {
-        char rank = (char) (square.getRank() + 64);
-        char file = Integer.toString(square.getFile()).charAt(0);
+        char rank = Integer.toString(square.getFile() + 1).charAt(0);
+        char file = (char) (square.getRank() + 97);
 
         return MessageFormat.format("{0}{1}", file, rank);
     }
@@ -129,7 +129,7 @@ public class PgnConverter {
      * @param squareString The string representing the square.
      * @return The Square object which is represented by the string.
      */
-    public Square pgnToSquare(String squareString){
+    public Square pgnToSquare(String squareString) {
         int rank = Integer.parseInt(squareString.substring(1, 2)) - 1;
         int file = (squareString.charAt(0) - 97);
 
