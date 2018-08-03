@@ -70,7 +70,7 @@ public class MoveAnalyser {
             }
         }
 
-        if(destSquare.isOccupied()){
+        if (destSquare.isOccupied()) {
             analysisBuilder.setCaptureMove(true);
         }
 
@@ -242,7 +242,7 @@ public class MoveAnalyser {
         Square kingSquare = BoardUtils.getKing(board, board.getPlayerToMove());
         MoveVector castleDirection = rookSquare.getFile() == 0 ? MoveVector.LEFT : MoveVector.RIGHT;
 
-        if (new PositionAnalyser(board).isCheck()){
+        if (new PositionAnalyser(board).isCheck()) {
             return false;
         }
 
@@ -250,20 +250,20 @@ public class MoveAnalyser {
             MoveVector moveVector = castleDirection.extend(i);
             Square newSquare = BoardUtils.addMoveToSquare(board, kingSquare, moveVector);
 
-            if(newSquare != null){
+            if (newSquare != null) {
                 Board newPosition = MovePerformer.movePiece(board, kingSquare, newSquare);
 
-                if(new PositionAnalyser(newPosition).isCheck()){
+                if (new PositionAnalyser(newPosition).isCheck()) {
                     return false;
                 }
             }
         }
 
         // Checks if there is a knight in the way of the rook in a queen side castling
-        if(rookSquare.getFile() == 0){
+        if (rookSquare.getFile() == 0) {
             int knightRank = board.getPlayerToMove() == Alliance.WHITE ? 0 : 7;
             Square knightSquare = board.getSquares()[knightRank][1];
-            if(knightSquare.isOccupied()){
+            if (knightSquare.isOccupied()) {
                 return false;
             }
         }

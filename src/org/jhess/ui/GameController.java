@@ -11,7 +11,7 @@ import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.PieceType;
-import org.jhess.logic.board.PositionAnalyser;
+import org.jhess.logic.GameAnalyser;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
 
@@ -46,10 +46,10 @@ public class GameController {
     private void nextTurn(Board newPosition, GameMove playedMove) {
         game.addTurn(newPosition, playedMove);
 
+//        PositionAnalyser positionAnalyser = new PositionAnalyser(game.getCurrentPosition());
+        GameAnalyser gameAnalyser = new GameAnalyser(game);
 
-        PositionAnalyser positionAnalyser = new PositionAnalyser(game.getCurrentPosition());
-
-        if (positionAnalyser.isMate()) {
+        if (gameAnalyser.isMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
@@ -63,7 +63,7 @@ public class GameController {
             gameWindow.getStage().close();
             return;
 
-        } else if (positionAnalyser.isStaleMate()) {
+        } else if (gameAnalyser.isStaleMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
@@ -77,7 +77,7 @@ public class GameController {
             gameWindow.getStage().close();
             return;
 
-        } else if (positionAnalyser.isFiftyMoveDraw()) {
+        } else if (gameAnalyser.isFiftyMoveDraw()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
@@ -86,6 +86,20 @@ public class GameController {
             alert.setTitle("The game has ended");
             alert.setHeaderText(null);
             alert.setContentText("Fifty move draw!");
+            alert.showAndWait();
+
+            gameWindow.getStage().close();
+            return;
+
+        } else if (gameAnalyser.isThreeFoldRepetition()) {
+            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
+
+            drawBoard(otherPlayer);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("The game has ended");
+            alert.setHeaderText(null);
+            alert.setContentText("Draw by repetition!");
             alert.showAndWait();
 
             gameWindow.getStage().close();

@@ -13,7 +13,7 @@ public class Pawn extends Piece {
 
 
     public Pawn(Alliance alliance, Square square) {
-        super(alliance, square, PieceType.PAWN );
+        super(alliance, square, PieceType.PAWN);
     }
 
     public Pawn(Alliance alliance) {
@@ -24,7 +24,7 @@ public class Pawn extends Piece {
     public List<MoveVector> getMoveList() {
         List<MoveVector> moveVectorList = new ArrayList<>();
 
-        if(alliance == Alliance.WHITE){
+        if (alliance == Alliance.WHITE) {
             moveVectorList.add(FORWARD);
             moveVectorList.add(FORWARD_LEFT);
             moveVectorList.add(FORWARD_RIGHT);
