@@ -1,33 +1,32 @@
 package org.jhess.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-public class GameWindow extends JFrame {
+public class GameWindow {
 
-    private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 400);
-
-    private final BoardPanel boardPanel = new BoardPanel(BOARD_PANEL_DIMENSION);
+    private final Stage stage = new Stage();
+    private final BoardPane boardPane = new BoardPane();
 
     public GameWindow() {
-        setTitle("Jhess");
+        stage.setTitle("Jhess - Two Player Game");
 
-        setLayout(new BorderLayout());
+        Scene boardScene = new Scene(boardPane.getGridPane());
 
-        setSize(600, 600);
-        setResizable(false);
+        stage.setMinHeight(600);
+        stage.setMinWidth(600);
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        stage.setHeight(600);
+        stage.setWidth(600);
 
-        WindowUtils.centerWindow(this);
-        initPanel();
+        stage.setScene(boardScene);
     }
 
-    private void initPanel() {
-        add(boardPanel, BorderLayout.CENTER);
+    public Stage getStage() {
+        return stage;
     }
 
-    BoardPanel getBoardPanel() {
-        return boardPanel;
+    public BoardPane getBoardPane() {
+        return boardPane;
     }
 }

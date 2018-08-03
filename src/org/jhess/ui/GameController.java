@@ -1,5 +1,8 @@
 package org.jhess.ui;
 
+import javafx.scene.control.Alert;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import org.jhess.core.Alliance;
 import org.jhess.core.Game;
 import org.jhess.core.board.Board;
@@ -12,7 +15,6 @@ import org.jhess.logic.board.PositionAnalyser;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
 
-import javax.swing.*;
 import java.text.MessageFormat;
 
 public class GameController {
@@ -20,7 +22,7 @@ public class GameController {
     private final Game game;
     private final GameWindow gameWindow;
 
-    private SquarePanel srcSquare = null;
+    private SquarePane srcSquare = null;
     private Piece pieceToMove;
 
     GameController(Game game, GameWindow gameWindow) {
@@ -34,8 +36,8 @@ public class GameController {
      * Initiates the controller
      */
     private void initiate() {
-        gameWindow.getBoardPanel().addSquareClickedListener(this::handleSquareClicked);
-        gameWindow.getBoardPanel().drawBoard(game.getCurrentPosition(), false);
+        gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
+        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition(), false);
     }
 
     /**
@@ -44,34 +46,49 @@ public class GameController {
     private void nextTurn(Board newPosition, GameMove playedMove) {
         game.addTurn(newPosition, playedMove);
 
+
         PositionAnalyser positionAnalyser = new PositionAnalyser(game.getCurrentPosition());
 
         if (positionAnalyser.isMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
-            JOptionPane.showMessageDialog(null,
-                    MessageFormat.format("Checkmate! {0} is the winner.", otherPlayer.toString()));
 
-            gameWindow.setVisible(false);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("The game has ended");
+            alert.setHeaderText(null);
+            alert.setContentText(MessageFormat.format("Checkmate! {0} is the winner.", otherPlayer.toString()));
+            alert.showAndWait();
+
+            gameWindow.getStage().close();
             return;
 
         } else if (positionAnalyser.isStaleMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
-            JOptionPane.showMessageDialog(null, "Stalemate!");
 
-            gameWindow.setVisible(false);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("The game has ended");
+            alert.setHeaderText(null);
+            alert.setContentText("Stalemate!");
+            alert.showAndWait();
+
+            gameWindow.getStage().close();
             return;
 
-        } else if (positionAnalyser.isFiftyMoveDraw()){
+        } else if (positionAnalyser.isFiftyMoveDraw()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             drawBoard(otherPlayer);
-            JOptionPane.showMessageDialog(null, "Fifty Move Draw!");
 
-            gameWindow.setVisible(false);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("The game has ended");
+            alert.setHeaderText(null);
+            alert.setContentText("Fifty move draw!");
+            alert.showAndWait();
+
+            gameWindow.getStage().close();
             return;
         }
 
@@ -83,7 +100,7 @@ public class GameController {
      */
     private void drawBoard(Alliance currentPlayer) {
         boolean reverseBoard = currentPlayer == Alliance.BLACK;
-        SwingUtilities.invokeLater(() -> gameWindow.getBoardPanel().drawBoard(game.getCurrentPosition(), reverseBoard));
+        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition(), reverseBoard);
     }
 
     /**
@@ -91,11 +108,12 @@ public class GameController {
      *
      * @param e The Square clicked event.
      */
-    private void handleSquareClicked(SquareClickedEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e.getMouseEvent())) {
-            leftMouseClicked(((SquarePanel) e.getSource()));
+    private void handleSquareClicked(MouseEvent e) {
 
-        } else if (SwingUtilities.isRightMouseButton(e.getMouseEvent())) {
+        if (e.getButton() == MouseButton.PRIMARY) {
+            leftMouseClicked(((SquarePane) e.getSource()));
+
+        } else if (e.getButton() == MouseButton.SECONDARY) {
             rightMouseClicked();
         }
     }
@@ -105,7 +123,7 @@ public class GameController {
      *
      * @param clickedSquare The clicked square.
      */
-    private void leftMouseClicked(SquarePanel clickedSquare) {
+    private void leftMouseClicked(SquarePane clickedSquare) {
         if (srcSquare == null) {
             firstClick(clickedSquare);
 
@@ -130,7 +148,8 @@ public class GameController {
      *
      * @param clickedSquare The clicked square.
      */
-    private void firstClick(SquarePanel clickedSquare) {
+    private void firstClick(SquarePane clickedSquare) {
+
         Square square = clickedSquare.getSquare();
 
         if (square.getPiece() != null && square.getPiece().getAlliance() == game.getPlayerToMove()) {
@@ -150,14 +169,15 @@ public class GameController {
      *
      * @param clickedSquare The clicked square.
      */
-    private void secondClick(SquarePanel clickedSquare) {
+    private void secondClick(SquarePane clickedSquare) {
         Square destSquare = clickedSquare.getSquare();
         MovePerformer movePerformer = new MovePerformer(game.getCurrentPosition());
         MoveAnalysis moveAnalysis = new MoveAnalyser(game.getCurrentPosition()).analyseMove(srcSquare.getSquare(), destSquare);
 
         PieceType pieceToPromoteTo = null;
         if (moveAnalysis.isPromotionMove()) {
-            pieceToPromoteTo = new PromotionDialog(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
+//            pieceToPromoteTo = new PromotionDialog(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
+            pieceToPromoteTo = new PromotionWindow(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
         }
 
         Board newPosition = movePerformer.makeMove(srcSquare.getSquare(), destSquare, pieceToPromoteTo);
