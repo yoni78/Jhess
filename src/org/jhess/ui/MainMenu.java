@@ -12,11 +12,15 @@ public class MainMenu {
         Platform.exit();
     }
 
-    public void btnPositionAnalyser(ActionEvent actionEvent) {
+    public void btnPositionAnalyserClicked(ActionEvent actionEvent) {
+        Game game = new Game();
+        PositionAnalyserWindow gameWindow = new PositionAnalyserWindow();
+        PositionAnalyserController gameController = new PositionAnalyserController(game, gameWindow);
 
+        gameWindow.getStage().show();
     }
 
-    public void btnTwoPlayerGame(ActionEvent actionEvent) {
+    public void btnTwoPlayerGameClicked(ActionEvent actionEvent) {
         Game game = new Game();
         GameWindow gameWindow = new GameWindow();
         GameController gameController = new GameController(game, gameWindow);

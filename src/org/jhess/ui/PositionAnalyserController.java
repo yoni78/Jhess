@@ -17,15 +17,15 @@ import org.jhess.logic.moves.MovePerformer;
 
 import java.text.MessageFormat;
 
-public class GameController {
+public class PositionAnalyserController {
 
     private final Game game;
-    private final GameWindow gameWindow;
+    private final PositionAnalyserWindow gameWindow;
 
     private SquarePane srcSquare = null;
     private Piece pieceToMove;
 
-    GameController(Game game, GameWindow gameWindow) {
+    PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
         this.game = game;
         this.gameWindow = gameWindow;
 
@@ -37,7 +37,7 @@ public class GameController {
      */
     private void initiate() {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
-        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition(), false);
+        drawBoard();
     }
 
     /**
@@ -52,8 +52,6 @@ public class GameController {
         if (gameAnalyser.isMate()) {
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
-            drawBoard(otherPlayer);
-
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Checkmate");
             alert.setHeaderText(null);
@@ -64,9 +62,6 @@ public class GameController {
             return;
 
         } else if (gameAnalyser.isStaleMate()) {
-            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
-
-            drawBoard(otherPlayer);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -78,9 +73,7 @@ public class GameController {
             return;
 
         } else if (gameAnalyser.isFiftyMoveDraw()) {
-            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
-            drawBoard(otherPlayer);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -92,9 +85,6 @@ public class GameController {
             return;
 
         } else if (gameAnalyser.isThreeFoldRepetition()) {
-            Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
-
-            drawBoard(otherPlayer);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -106,15 +96,14 @@ public class GameController {
             return;
         }
 
-        drawBoard(game.getPlayerToMove());
+        drawBoard();
     }
 
     /**
      * Draws the board in the correct orientation for the current player.
      */
-    private void drawBoard(Alliance currentPlayer) {
-        boolean reverseBoard = currentPlayer == Alliance.BLACK;
-        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition(), reverseBoard);
+    private void drawBoard() {
+        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition());
     }
 
     /**

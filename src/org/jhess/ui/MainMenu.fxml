@@ -15,13 +15,13 @@
                <font>
                   <Font size="48.0" />
                </font></Text>
-                <Button minHeight="40.0" minWidth="120.0" mnemonicParsing="false" onAction="#btnTwoPlayerGame" text="Two-Player Game">
+                <Button minHeight="40.0" minWidth="120.0" mnemonicParsing="false" onAction="#btnTwoPlayerGameClicked" text="Two-Player Game">
                     <VBox.margin>
                         <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
                     </VBox.margin>
                 </Button>
 
-                <Button minHeight="40.0" minWidth="120.0" mnemonicParsing="false" onAction="#btnPositionAnalyser" text="Position Analyser">
+                <Button minHeight="40.0" minWidth="120.0" mnemonicParsing="false" onAction="#btnPositionAnalyserClicked" text="Position Analyser">
                     <VBox.margin>
                         <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
                     </VBox.margin>

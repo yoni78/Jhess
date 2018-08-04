@@ -58,6 +58,10 @@ public class BoardPane {
         }
     }
 
+    public void drawBoard(Board board) {
+        drawBoard(board, false);
+    }
+
     public void setOnMouseClicked(EventHandler<MouseEvent> eventHandler){
         this.eventHandler = eventHandler;
     }
