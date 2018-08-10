@@ -1,8 +1,13 @@
 package org.jhess.logic;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.pieces.Piece;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Converts to and from the FEN format.
@@ -19,45 +24,141 @@ public class FenConverter {
 
     /**
      * Expands rows with empty spaces to make them easier to parse.
+     *
      * @param row A row in FEN format.
      * @return A new row with a length of 8 where the blank squares are filled with a '-'.
      */
-    private String expandRow(String row){
+    private String expandRow(String row) {
         // If the row doesn't contain a blank square, return it
-        if (!row.matches(".*\\d+.*")){
+        if (!row.matches(".*\\d+.*")) {
             return row;
         }
 
         StringBuilder newRow = new StringBuilder();
-        for(char col : row.toCharArray()){
+        for (char col : row.toCharArray()) {
             int emptySquares = 0;
-            try{
+            try {
                 emptySquares = Integer.parseInt(Character.toString(col));
-            } catch (NumberFormatException ignored){ }
+            } catch (NumberFormatException ignored) {
+            }
 
-            if (emptySquares != 0){
-                for (int i = 0; i < emptySquares; i++){
+            if (emptySquares != 0) {
+                for (int i = 0; i < emptySquares; i++) {
                     newRow.append('-');
                 }
             } else {
-                    newRow.append(col);
+                newRow.append(col);
             }
         }
 
         return newRow.toString();
     }
 
-    public Piece[][] getPieces(){
+    /**
+     * Creates the pieces section of the FEN string from the Board object.
+     *
+     * @param board The board.
+     * @return The piece section of a FEN string which represents the given board.
+     */
+    private static String piecesToFen(Board board) {
+        StringBuilder[] pieces = new StringBuilder[8];
+        PgnConverter pgnConverter = new PgnConverter();
+
+        for (int i = 0; i < pieces.length; i++) {
+            pieces[i] = new StringBuilder();
+        }
+
+        for (int i = 7; i >= 0; i--) {
+
+            int emptySquaresCounter = 0;
+            for (int j = 0; j < 8; j++) {
+                Piece piece = board.getSquares()[i][j].getPiece();
+
+                if (piece != null) {
+
+                    if (emptySquaresCounter > 0) {
+                        pieces[7 - i].append(emptySquaresCounter);
+                    }
+
+                    pieces[7 - i].append(pgnConverter.pieceToPgn(piece));
+                    emptySquaresCounter = 0;
+
+                } else {
+                    emptySquaresCounter++;
+                }
+
+                if (j == 7 && emptySquaresCounter > 0) {
+                    pieces[7 - i].append(emptySquaresCounter);
+                }
+            }
+        }
+
+        List<String> rowStrings = Arrays.stream(pieces)
+                .map(StringBuilder::toString)
+                .collect(Collectors.toList());
+
+        return String.join("/", rowStrings);
+    }
+
+    /**
+     * Creates the castling rights section of the FEN string from the Board object.
+     *
+     * @param board The board.
+     * @return The castling rights section of a FEN string which represents the given board.
+     */
+    private static String castlingRightsToFen(Board board) {
+        StringBuilder castlingString = new StringBuilder();
+
+        if (board.isWhiteCanCastleKingSide()) {
+            castlingString.append('K');
+        }
+
+        if (board.isWhiteCanCastleQueenSide()) {
+            castlingString.append('Q');
+        }
+
+        if (board.isBlackCanCastleKingSide()) {
+            castlingString.append('k');
+        }
+
+        if (board.isBlackCanCastleQueenSide()) {
+            castlingString.append('q');
+        }
+
+        return castlingString.toString();
+    }
+
+    /**
+     * Converts a Board object to a FEN string.
+     *
+     * @param board The board.
+     * @return A FEN string representing the board.
+     */
+    public static String boardToFen(Board board) {
+
+        PgnConverter pgnConverter = new PgnConverter();
+
+        String pieces = piecesToFen(board);
+        String playerToMove = String.valueOf(pgnConverter.allianceToPgn(board.getPlayerToMove()));
+        String castlingRights = castlingRightsToFen(board);
+        String enPassantSquare = board.getEnPassantTarget() != null ? pgnConverter.squareToPgn(board.getEnPassantTarget()) : "-";
+        String halfMoveClock = String.valueOf(board.getHalfMoveClock());
+        String fullMoveNumber = String.valueOf(board.getFullMoveNumber());
+
+        return String.join(" ", pieces, playerToMove, castlingRights, enPassantSquare, halfMoveClock, fullMoveNumber);
+    }
+
+    public Piece[][] getPieces() {
         PgnConverter pgnConverter = new PgnConverter();
 
         Piece[][] pieces = new Piece[8][8];
-        String[]rows = fen.split(" ")[0].split("/");
+        String[] rows = fen.split(" ")[0].split("/");
 
-        for (int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             String newRow = expandRow(rows[i]);
 
-            for(int j = 0; j < 8; j++){
-                if(newRow.charAt(j) != '-'){
+            for (int j = 0; j < 8; j++) {
+                if (newRow.charAt(j) != '-') {
                     pieces[7 - i][j] = pgnConverter.pgnToPiece(newRow.toCharArray()[j]);
                 }
             }

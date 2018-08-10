@@ -1,8 +1,10 @@
 package org.jhess.ui;
 
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import org.jhess.core.Alliance;
 import org.jhess.core.Game;
 import org.jhess.core.board.Board;
@@ -11,10 +13,14 @@ import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.PieceType;
+import org.jhess.logic.FenConverter;
 import org.jhess.logic.GameAnalyser;
+import org.jhess.logic.PgnConverter;
+import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 
 public class PositionAnalyserController {
@@ -22,8 +28,13 @@ public class PositionAnalyserController {
     private final Game game;
     private final PositionAnalyserWindow gameWindow;
 
+    private EngineCommunicator engineCommunicator;
+
     private SquarePane srcSquare = null;
     private Piece pieceToMove;
+
+    private SquarePane bestMoveSrcSquare;
+    private SquarePane bestMoveDestSquare;
 
     PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
         this.game = game;
@@ -38,6 +49,14 @@ public class PositionAnalyserController {
     private void initiate() {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
         drawBoard();
+
+        try {
+            engineCommunicator = new EngineCommunicator("C:\\Users\\Yoni.DESKTOP-9C58T0E\\Desktop\\stockfish-9-win\\Windows\\stockfish_9_x64.exe");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        highLightBestMove();
     }
 
     /**
@@ -46,7 +65,6 @@ public class PositionAnalyserController {
     private void nextTurn(Board newPosition, GameMove playedMove) {
         game.addTurn(newPosition, playedMove);
 
-//        PositionAnalyser positionAnalyser = new PositionAnalyser(game.getCurrentPosition());
         GameAnalyser gameAnalyser = new GameAnalyser(game);
 
         if (gameAnalyser.isMate()) {
@@ -97,6 +115,7 @@ public class PositionAnalyserController {
         }
 
         drawBoard();
+        highLightBestMove();
     }
 
     /**
@@ -104,6 +123,49 @@ public class PositionAnalyserController {
      */
     private void drawBoard() {
         gameWindow.getBoardPane().drawBoard(game.getCurrentPosition());
+    }
+
+    /**
+     * Gets the best move from the engine an show it on the board
+     */
+    private void highLightBestMove() {
+        String bestMoveString = null;
+        try {
+            System.out.println(FenConverter.boardToFen(game.getCurrentPosition()));
+            bestMoveString = engineCommunicator.getBestMove(FenConverter.boardToFen(game.getCurrentPosition()));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (bestMoveString == null) {
+            return;
+        }
+
+        PgnConverter pgnConverter = new PgnConverter();
+
+        Square bestMoveSrcSquare = pgnConverter.pgnToSquare(bestMoveString.substring(0, 2));
+        Square bestMoveDestSquare = pgnConverter.pgnToSquare(bestMoveString.substring(2, 4));
+
+        SquarePane bestMoveSrcSquarePane = null;
+        SquarePane bestMoveDestSquarePane = null;
+
+        for (Node n : gameWindow.getBoardPane().getGridPane().getChildren()) {
+            if (((SquarePane) n).getSquare().getRank() == bestMoveSrcSquare.getRank() && ((SquarePane) n).getSquare().getFile() == bestMoveSrcSquare.getFile()) {
+                bestMoveSrcSquarePane = (SquarePane) n;
+
+            } else if (((SquarePane) n).getSquare().getRank() == bestMoveDestSquare.getRank() && ((SquarePane) n).getSquare().getFile() == bestMoveDestSquare.getFile()) {
+                bestMoveDestSquarePane = (SquarePane) n;
+            }
+        }
+
+        if (bestMoveSrcSquarePane != null) {
+            bestMoveSrcSquarePane.highLightBorder(Color.GREEN);
+        }
+
+        if (bestMoveDestSquarePane != null) {
+            bestMoveDestSquarePane.highLightBorder(Color.GREEN);
+        }
     }
 
     /**
@@ -163,7 +225,7 @@ public class PositionAnalyserController {
 
             pieceToMove = square.getPiece();
             srcSquare = clickedSquare;
-            srcSquare.highLightBorder();
+            srcSquare.highLightBorder(Color.FIREBRICK);
         }
     }
 
@@ -179,7 +241,6 @@ public class PositionAnalyserController {
 
         PieceType pieceToPromoteTo = null;
         if (moveAnalysis.isPromotionMove()) {
-//            pieceToPromoteTo = new PromotionDialog(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
             pieceToPromoteTo = new PromotionWindow(game.getCurrentPosition().getPlayerToMove()).getSelectedPieceType();
         }
 

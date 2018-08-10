@@ -110,7 +110,8 @@ public final class BoardUtils {
 
     /**
      * Returns the square represented by the pgn on the given board.
-     * @param board The game board.
+     *
+     * @param board     The game board.
      * @param squarePgn The PGN string which represents the square.
      * @return The requested square from the board.
      */

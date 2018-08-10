@@ -23,6 +23,7 @@ public class SquarePane extends StackPane {
         this.square = square;
 
         rectangle.setStrokeType(StrokeType.INSIDE);
+        rectangle.setStrokeWidth(4);
 
         imageView.fitWidthProperty().bind(rectangle.widthProperty().subtract(10));
         imageView.fitHeightProperty().bind(rectangle.heightProperty().subtract(10));
@@ -43,8 +44,8 @@ public class SquarePane extends StackPane {
         return imageView;
     }
 
-    public void highLightBorder() {
-        rectangle.setStroke(Color.FIREBRICK);
+    public void highLightBorder(Color color) {
+        rectangle.setStroke(color);
     }
 
     public void removeHighLight() {

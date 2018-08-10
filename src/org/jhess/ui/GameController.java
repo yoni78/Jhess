@@ -3,6 +3,7 @@ package org.jhess.ui;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import org.jhess.core.Alliance;
 import org.jhess.core.Game;
 import org.jhess.core.board.Board;
@@ -174,7 +175,7 @@ public class GameController {
 
             pieceToMove = square.getPiece();
             srcSquare = clickedSquare;
-            srcSquare.highLightBorder();
+            srcSquare.highLightBorder(Color.FIREBRICK);
         }
     }
 
