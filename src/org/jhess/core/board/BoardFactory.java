@@ -1,7 +1,7 @@
 package org.jhess.core.board;
 
 import org.jhess.core.pieces.*;
-import org.jhess.logic.FenConverter;
+import org.jhess.logic.Pgn.FenConverter;
 
 /**
  * Creates boards.

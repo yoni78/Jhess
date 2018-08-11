@@ -1,4 +1,4 @@
-package org.jhess.logic;
+package org.jhess.logic.Pgn;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Square;
@@ -117,8 +117,8 @@ public class PgnConverter {
      * @return The string which represents the square.
      */
     public String squareToPgn(Square square) {
-        char rank = Integer.toString(square.getFile() + 1).charAt(0);
-        char file = (char) (square.getRank() + 97);
+        char rank = Integer.toString(square.getRank() + 1).charAt(0);
+        char file = (char) (square.getFile() + 97);
 
         return MessageFormat.format("{0}{1}", file, rank);
     }

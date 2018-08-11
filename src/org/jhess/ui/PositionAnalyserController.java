@@ -13,15 +13,16 @@ import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.PieceType;
-import org.jhess.logic.FenConverter;
 import org.jhess.logic.GameAnalyser;
-import org.jhess.logic.PgnConverter;
+import org.jhess.logic.Pgn.PgnConverter;
 import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PositionAnalyserController {
 
@@ -50,13 +51,23 @@ public class PositionAnalyserController {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
         drawBoard();
 
+        initEngine();
+
+        highLightBestMove();
+    }
+
+    /**
+     * Starts the engine process and initializes the engine.
+     */
+    private void initEngine() {
         try {
-            engineCommunicator = new EngineCommunicator("C:\\Users\\Yoni.DESKTOP-9C58T0E\\Desktop\\stockfish-9-win\\Windows\\stockfish_9_x64.exe");
+            engineCommunicator = new EngineCommunicator("C:\\Users\\Yoni.DESKTOP-9C58T0E\\Desktop\\stockfish-9-win\\Windows\\stockfish_9_x64.exe"); // TODO: 2018-08-10 Get the engine path from the user or default
+            engineCommunicator.useUci();
+            engineCommunicator.startNewGame();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        highLightBestMove();
     }
 
     /**
@@ -125,14 +136,25 @@ public class PositionAnalyserController {
         gameWindow.getBoardPane().drawBoard(game.getCurrentPosition());
     }
 
+    private List<String> getMoveList() {
+        List<String> moveList = new ArrayList<>();
+
+        PgnConverter pgnConverter = new PgnConverter();
+        for (GameMove gameMove : game.getMoveList()) {
+            moveList.add(pgnConverter.squareToPgn(gameMove.getSrcSquare()) + pgnConverter.squareToPgn(gameMove.getDestSquare()));
+        }
+
+        return moveList;
+    }
+
     /**
      * Gets the best move from the engine an show it on the board
      */
     private void highLightBestMove() {
         String bestMoveString = null;
         try {
-            System.out.println(FenConverter.boardToFen(game.getCurrentPosition()));
-            bestMoveString = engineCommunicator.getBestMove(FenConverter.boardToFen(game.getCurrentPosition()));
+            engineCommunicator.setPositionWithMoves(getMoveList());
+            bestMoveString = engineCommunicator.getBestMove();
 
         } catch (IOException e) {
             e.printStackTrace();

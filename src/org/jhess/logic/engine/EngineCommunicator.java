@@ -67,13 +67,38 @@ public class EngineCommunicator {
         List<String> response = readResponse("uciok");
     }
 
-    public void setPosition(String position) throws IOException{
+    /**
+     * Tells the engine that it is searching on a game that is hasn't searched on before.
+     * @throws IOException If it couldn't write to the engine.
+     */
+    public void startNewGame() throws IOException {
+        sendCommand("ucinewgame");
+    }
+
+    /**
+     * Sets the position of the internal board of the engine to the given FEN.
+     * @param position The position to set.
+     * @throws IOException If it couldn't write to the engine.
+     */
+    public void setPositionWithFen(String position) throws IOException{
         sendCommand(MessageFormat.format("{0} fen {1}", "position", position)); // TODO: 2018-08-10 Switch to using startpos + moves
     }
 
-    public String getBestMove(String position) throws IOException {
-        setPosition(position);
+    /**
+     * Sets the position of the internal board of the engine to the start position and adding to it the given moves.
+     * @param moves The moves played in the game.
+     * @throws IOException If it couldn't write to the engine.
+     */
+    public void setPositionWithMoves(List<String> moves) throws IOException {
+        sendCommand("position startpos moves " + String.join(" ", moves));
+    }
 
+    /**
+     * Gets from the engine the best move for the current position.
+     * @return The best move for the current position.
+     * @throws IOException If it couldn't write to the engine.
+     */
+    public String getBestMove() throws IOException {
         sendCommand("go");
         List<String> response = readResponse("bestmove");
 
