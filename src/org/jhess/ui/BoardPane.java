@@ -23,6 +23,7 @@ public class BoardPane {
     }
 
     public void drawBoard(Board board, boolean reverse) {
+        // FIXME: 2018-08-11 When drawing the board, it gets a new minimum size
         gridPane.getChildren().removeAll();
 
         final int size = 8;

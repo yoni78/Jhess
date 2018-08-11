@@ -29,13 +29,14 @@ public class PositionAnalyserController {
     private final Game game;
     private final PositionAnalyserWindow gameWindow;
 
+    private boolean reverseBoard = false;
+
     private EngineCommunicator engineCommunicator;
 
     private SquarePane srcSquare = null;
     private Piece pieceToMove;
 
-    private SquarePane bestMoveSrcSquare;
-    private SquarePane bestMoveDestSquare;
+    private int gamePositionOffset = 0;
 
     PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
         this.game = game;
@@ -49,6 +50,12 @@ public class PositionAnalyserController {
      */
     private void initiate() {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
+        gameWindow.getBtnFlip().setOnMouseClicked(this::btnFlipClicked);
+        gameWindow.getBtnBack().setOnMouseClicked(this::btnBackClicked);
+        gameWindow.getBtnFwd().setOnMouseClicked(this::btnFwdClicked);
+        gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
+        gameWindow.getBtnCurrentPos().setOnMouseClicked(this::btnCurrentPosClicked);
+
         drawBoard();
 
         initEngine();
@@ -74,7 +81,7 @@ public class PositionAnalyserController {
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn(Board newPosition, GameMove playedMove) {
-        game.addTurn(newPosition, playedMove);
+        game.addTurn(newPosition, playedMove); // TODO: 2018-08-11 If the player played a move in a past position, create a new game with the new moves
 
         GameAnalyser gameAnalyser = new GameAnalyser(game);
 
@@ -133,9 +140,16 @@ public class PositionAnalyserController {
      * Draws the board in the correct orientation for the current player.
      */
     private void drawBoard() {
-        gameWindow.getBoardPane().drawBoard(game.getCurrentPosition());
+
+        int positionIndex = (game.getPositionList().size() - 1) + gamePositionOffset;
+        gameWindow.getBoardPane().drawBoard(game.getPositionList().get(positionIndex), reverseBoard);
     }
 
+    /**
+     * Converts the current game's move list to a list of strings for the engine.
+     *
+     * @return A list of strings representing the game's move list.
+     */
     private List<String> getMoveList() {
         List<String> moveList = new ArrayList<>();
 
@@ -237,6 +251,11 @@ public class PositionAnalyserController {
      */
     private void firstClick(SquarePane clickedSquare) {
 
+        // So you can't make moves in the past
+        if (gamePositionOffset != 0){
+            return;
+        }
+
         Square square = clickedSquare.getSquare();
 
         if (square.getPiece() != null && square.getPiece().getAlliance() == game.getPlayerToMove()) {
@@ -273,4 +292,42 @@ public class PositionAnalyserController {
 
         rightMouseClicked();
     }
+
+    private void btnFlipClicked(MouseEvent mouseEvent) {
+        reverseBoard = !reverseBoard;
+        drawBoard();
+        highLightBestMove();
+    }
+
+    private void btnBackClicked(MouseEvent mouseEvent) {
+        if (!((game.getPositionList().size() - 1) + (gamePositionOffset - 1) < 0)) {
+            gamePositionOffset--;
+        }
+
+        drawBoard();
+        highLightBestMove();
+    }
+
+    private void btnFwdClicked(MouseEvent mouseEvent) {
+        if (!((game.getPositionList().size() - 1) + (gamePositionOffset + 1) >= game.getPositionList().size())) {
+            gamePositionOffset++;
+        }
+
+        drawBoard();
+        highLightBestMove();
+    }
+
+    private void btnCurrentPosClicked(MouseEvent mouseEvent) {
+        gamePositionOffset = 0;
+
+        drawBoard();
+        highLightBestMove();
+    }
+
+    private void btnRewindClicked(MouseEvent mouseEvent) {
+        gamePositionOffset = -(game.getPositionList().size() - 1);
+        drawBoard();
+        highLightBestMove();
+    }
+
 }
