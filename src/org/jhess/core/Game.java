@@ -29,11 +29,15 @@ public class Game {
         positionList.add(startPosition);
     }
 
-    public Game(Game game){
-        moveList = new ArrayList<>(game.getMoveList());
-        positionList = new ArrayList<>(game.getPositionList());
+    public Game(Game game, int lastMoveIndex){
+        moveList = new ArrayList<>(game.getMoveList().subList(0, lastMoveIndex - 1));
+        positionList = new ArrayList<>(game.getPositionList().subList(0, lastMoveIndex));
 
-        playerToMove = game.getPlayerToMove();
+        playerToMove = Iterables.getLast(positionList).getPlayerToMove();
+    }
+
+    public Game(Game game){
+        this(game, game.getPositionList().size());
     }
 
     private void swapAlliance(){

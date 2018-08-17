@@ -27,9 +27,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class PositionAnalyserController {
 
-    private final Game game;
+    private Game game;
     private final PositionAnalyserWindow gameWindow;
 
     private boolean reverseBoard = false;
@@ -60,6 +61,7 @@ public class PositionAnalyserController {
         gameWindow.getBtnFwd().setOnMouseClicked(this::btnFwdClicked);
         gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
         gameWindow.getBtnCurrentPos().setOnMouseClicked(this::btnCurrentPosClicked);
+        gameWindow.getBtnContinue().setOnMouseClicked(this::btnContinueClicked);
 
         drawBoard();
 
@@ -86,11 +88,13 @@ public class PositionAnalyserController {
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn(Board newPosition, GameMove playedMove) {
-        game.addTurn(newPosition, playedMove); // TODO: 2018-08-11 If the player played a move in a past position, create a new game with the new moves
+        game.addTurn(newPosition, playedMove);
 
         GameAnalyser gameAnalyser = new GameAnalyser(game);
 
         if (gameAnalyser.isMate()) {
+            drawBoard();
+
             Alliance otherPlayer = game.getPlayerToMove() == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -103,6 +107,7 @@ public class PositionAnalyserController {
             return;
 
         } else if (gameAnalyser.isStaleMate()) {
+            drawBoard();
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -114,7 +119,7 @@ public class PositionAnalyserController {
             return;
 
         } else if (gameAnalyser.isFiftyMoveDraw()) {
-
+            drawBoard();
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -126,6 +131,7 @@ public class PositionAnalyserController {
             return;
 
         } else if (gameAnalyser.isThreeFoldRepetition()) {
+            drawBoard();
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Draw");
@@ -311,7 +317,7 @@ public class PositionAnalyserController {
     private void btnEngineClicked(MouseEvent mouseEvent) {
         useEngine = !useEngine;
 
-        if(useEngine){
+        if (useEngine) {
             gameWindow.getBtnEngine().setText("Engine: on");
         } else {
             gameWindow.getBtnEngine().setText("Engine: off");
@@ -350,6 +356,11 @@ public class PositionAnalyserController {
         gamePositionOffset = -(game.getPositionList().size() - 1);
         drawBoard();
         highLightBestMove();
+    }
+
+    private void btnContinueClicked(MouseEvent mouseEvent) {
+        game = new Game(game, game.getPositionList().size() + gamePositionOffset);
+        gamePositionOffset = 0;
     }
 
 }

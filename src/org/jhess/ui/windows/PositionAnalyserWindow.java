@@ -21,6 +21,7 @@ public class PositionAnalyserWindow {
     Button btnFwd = new Button(">");
     Button btnRewind = new Button("<<");
     Button btnCurrentPos = new Button(">>");
+    Button btnContinue = new Button("Continue from here");
 
     public PositionAnalyserWindow() {
         stage.setTitle("Jhess - Position Analyser");
@@ -39,7 +40,7 @@ public class PositionAnalyserWindow {
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(5));
-        hBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos);
+        hBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue);
 
         borderPane.setCenter(anchorPane);
         borderPane.setRight(vBox);
@@ -86,5 +87,9 @@ public class PositionAnalyserWindow {
 
     public Button getBtnEngine() {
         return btnEngine;
+    }
+
+    public Button getBtnContinue() {
+        return btnContinue;
     }
 }
