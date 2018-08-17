@@ -16,6 +16,7 @@ public class PositionAnalyserWindow {
     private final BoardPane boardPane = new BoardPane();
 
     Button btnFlip = new Button("Flip Board");
+    Button btnEngine = new Button("Engine: off");
     Button btnBack = new Button("<");
     Button btnFwd = new Button(">");
     Button btnRewind = new Button("<<");
@@ -34,7 +35,7 @@ public class PositionAnalyserWindow {
 
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(5));
-        vBox.getChildren().add(btnFlip);
+        vBox.getChildren().addAll(btnFlip, btnEngine);
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(5));
@@ -81,5 +82,9 @@ public class PositionAnalyserWindow {
 
     public Button getBtnCurrentPos() {
         return btnCurrentPos;
+    }
+
+    public Button getBtnEngine() {
+        return btnEngine;
     }
 }

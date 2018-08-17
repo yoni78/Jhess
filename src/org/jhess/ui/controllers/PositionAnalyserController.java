@@ -18,9 +18,9 @@ import org.jhess.logic.Pgn.PgnConverter;
 import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
+import org.jhess.ui.panes.SquarePane;
 import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
-import org.jhess.ui.panes.SquarePane;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -33,6 +33,7 @@ public class PositionAnalyserController {
     private final PositionAnalyserWindow gameWindow;
 
     private boolean reverseBoard = false;
+    private boolean useEngine = false;
 
     private EngineCommunicator engineCommunicator;
 
@@ -54,6 +55,7 @@ public class PositionAnalyserController {
     private void initiate() {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
         gameWindow.getBtnFlip().setOnMouseClicked(this::btnFlipClicked);
+        gameWindow.getBtnEngine().setOnMouseClicked(this::btnEngineClicked);
         gameWindow.getBtnBack().setOnMouseClicked(this::btnBackClicked);
         gameWindow.getBtnFwd().setOnMouseClicked(this::btnFwdClicked);
         gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
@@ -143,7 +145,6 @@ public class PositionAnalyserController {
      * Draws the board in the correct orientation for the current player.
      */
     private void drawBoard() {
-
         int positionIndex = (game.getPositionList().size() - 1) + gamePositionOffset;
         gameWindow.getBoardPane().drawBoard(game.getPositionList().get(positionIndex), reverseBoard);
     }
@@ -168,6 +169,11 @@ public class PositionAnalyserController {
      * Gets the best move from the engine an show it on the board
      */
     private void highLightBestMove() {
+
+        if (!useEngine) {
+            return;
+        }
+
         String bestMoveString = null;
         try {
             engineCommunicator.setPositionWithMoves(getMoveList());
@@ -255,7 +261,7 @@ public class PositionAnalyserController {
     private void firstClick(SquarePane clickedSquare) {
 
         // So you can't make moves in the past
-        if (gamePositionOffset != 0){
+        if (gamePositionOffset != 0) {
             return;
         }
 
@@ -298,6 +304,19 @@ public class PositionAnalyserController {
 
     private void btnFlipClicked(MouseEvent mouseEvent) {
         reverseBoard = !reverseBoard;
+        drawBoard();
+        highLightBestMove();
+    }
+
+    private void btnEngineClicked(MouseEvent mouseEvent) {
+        useEngine = !useEngine;
+
+        if(useEngine){
+            gameWindow.getBtnEngine().setText("Engine: on");
+        } else {
+            gameWindow.getBtnEngine().setText("Engine: off");
+        }
+
         drawBoard();
         highLightBestMove();
     }

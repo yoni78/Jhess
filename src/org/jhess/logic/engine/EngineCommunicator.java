@@ -104,4 +104,18 @@ public class EngineCommunicator {
 
         return Iterables.getLast(response).split(" ")[1];
     }
+
+    /**
+     * Shuts down the engine process.
+     */
+    public void quit(){
+        try{
+            sendCommand("quit");
+
+        } catch (IOException e){
+            e.printStackTrace(); // TODO: 2018-08-17 Log
+            engineProcess.destroy();
+        }
+
+    }
 }
