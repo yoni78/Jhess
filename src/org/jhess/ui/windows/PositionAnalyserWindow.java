@@ -35,11 +35,14 @@ public class PositionAnalyserWindow {
         AnchorPane.setLeftAnchor(boardPane.getGridPane(), 0.0);
 
         VBox vBox = new VBox();
-        vBox.setPadding(new Insets(5));
+        vBox.setPadding(new Insets(10));
+        vBox.setSpacing(10);
+
         vBox.getChildren().addAll(btnFlip, btnEngine);
 
         HBox hBox = new HBox();
-        hBox.setPadding(new Insets(5));
+        hBox.setPadding(new Insets(10));
+        hBox.setSpacing(5);
         hBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue);
 
         borderPane.setCenter(anchorPane);
