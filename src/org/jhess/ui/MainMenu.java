@@ -4,6 +4,10 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import org.jhess.core.Game;
+import org.jhess.ui.controllers.GameController;
+import org.jhess.ui.controllers.PositionAnalyserController;
+import org.jhess.ui.windows.GameWindow;
+import org.jhess.ui.windows.PositionAnalyserWindow;
 
 public class MainMenu {
     public Button btnExit;

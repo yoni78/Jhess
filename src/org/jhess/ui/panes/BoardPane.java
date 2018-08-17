@@ -1,4 +1,4 @@
-package org.jhess.ui;
+package org.jhess.ui.panes;
 
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;

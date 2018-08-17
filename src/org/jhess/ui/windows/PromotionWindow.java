@@ -1,4 +1,4 @@
-package org.jhess.ui;
+package org.jhess.ui.windows;
 
 import javafx.scene.Scene;
 import javafx.scene.image.Image;

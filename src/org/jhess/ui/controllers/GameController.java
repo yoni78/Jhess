@@ -1,4 +1,4 @@
-package org.jhess.ui;
+package org.jhess.ui.controllers;
 
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
@@ -15,6 +15,9 @@ import org.jhess.core.pieces.PieceType;
 import org.jhess.logic.GameAnalyser;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
+import org.jhess.ui.windows.GameWindow;
+import org.jhess.ui.windows.PromotionWindow;
+import org.jhess.ui.panes.SquarePane;
 
 import java.text.MessageFormat;
 
@@ -26,7 +29,7 @@ public class GameController {
     private SquarePane srcSquare = null;
     private Piece pieceToMove;
 
-    GameController(Game game, GameWindow gameWindow) {
+    public GameController(Game game, GameWindow gameWindow) {
         this.game = game;
         this.gameWindow = gameWindow;
 

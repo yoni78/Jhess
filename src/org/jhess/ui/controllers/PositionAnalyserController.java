@@ -1,4 +1,4 @@
-package org.jhess.ui;
+package org.jhess.ui.controllers;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -18,6 +18,9 @@ import org.jhess.logic.Pgn.PgnConverter;
 import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
+import org.jhess.ui.windows.PositionAnalyserWindow;
+import org.jhess.ui.windows.PromotionWindow;
+import org.jhess.ui.panes.SquarePane;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -38,7 +41,7 @@ public class PositionAnalyserController {
 
     private int gamePositionOffset = 0;
 
-    PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
+    public PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
         this.game = game;
         this.gameWindow = gameWindow;
 
