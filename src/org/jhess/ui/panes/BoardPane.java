@@ -75,7 +75,7 @@ public class BoardPane {
         int rank = square.getSquare().getRank();
         int file = square.getSquare().getFile();
 
-        Color color = ((rank + file) % 2 == 0) ? Color.valueOf("#FFFACD") : Color.valueOf("#593E1A");
+        Color color = ((rank + file) % 2 == 0) ? Color.valueOf("#593E1A") : Color.valueOf("#FFFACD");
         square.getRectangle().setFill(color);
     }
 
