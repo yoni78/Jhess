@@ -1,4 +1,4 @@
-package org.jhess.logic.Pgn;
+package org.jhess.logic.pgn;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;

@@ -3,11 +3,12 @@ package org.jhess.ui.windows;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.jhess.ui.GameMoveListItem;
 import org.jhess.ui.panes.BoardPane;
 
 public class PositionAnalyserWindow {
@@ -23,6 +24,8 @@ public class PositionAnalyserWindow {
     Button btnCurrentPos = new Button(">>");
     Button btnContinue = new Button("Continue from here");
 
+    ListView<GameMoveListItem> moveList = new ListView<>();
+
     public PositionAnalyserWindow() {
         stage.setTitle("Jhess - Position Analyser");
 
@@ -34,20 +37,16 @@ public class PositionAnalyserWindow {
         AnchorPane.setRightAnchor(boardPane.getGridPane(), 0.0);
         AnchorPane.setLeftAnchor(boardPane.getGridPane(), 0.0);
 
-        VBox vBox = new VBox();
-        vBox.setPadding(new Insets(10));
-        vBox.setSpacing(10);
+        moveList.setPadding(new Insets(10));
 
-        vBox.getChildren().addAll(btnFlip, btnEngine);
-
-        HBox hBox = new HBox();
-        hBox.setPadding(new Insets(10));
-        hBox.setSpacing(5);
-        hBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue);
+        HBox controlsBox = new HBox();
+        controlsBox.setPadding(new Insets(10));
+        controlsBox.setSpacing(5);
+        controlsBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue, btnFlip, btnEngine);
 
         borderPane.setCenter(anchorPane);
-        borderPane.setRight(vBox);
-        borderPane.setBottom(hBox);
+        borderPane.setRight(moveList);
+        borderPane.setBottom(controlsBox);
 
         Scene boardScene = new Scene(borderPane);
 
@@ -94,5 +93,9 @@ public class PositionAnalyserWindow {
 
     public Button getBtnContinue() {
         return btnContinue;
+    }
+
+    public ListView<GameMoveListItem> getMoveList() {
+        return moveList;
     }
 }

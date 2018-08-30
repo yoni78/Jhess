@@ -1,7 +1,8 @@
-package org.jhess.logic.Pgn;
+package org.jhess.logic.pgn;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Square;
+import org.jhess.core.moves.GameMove;
 import org.jhess.core.pieces.*;
 
 import java.text.MessageFormat;
@@ -134,5 +135,15 @@ public class PgnConverter {
         int file = (squareString.charAt(0) - 97);
 
         return new Square(rank, file);
+    }
+
+    /**
+     * Serializers a move to PGN format.
+     *
+     * @param gameMove The move.
+     * @return The string which represents the move.
+     */
+    public String moveToPgn(GameMove gameMove) {
+        return squareToPgn(gameMove.getSrcSquare()) + squareToPgn(gameMove.getDestSquare());
     }
 }

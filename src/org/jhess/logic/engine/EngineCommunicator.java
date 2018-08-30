@@ -69,6 +69,7 @@ public class EngineCommunicator {
 
     /**
      * Tells the engine that it is searching on a game that is hasn't searched on before.
+     *
      * @throws IOException If it couldn't write to the engine.
      */
     public void startNewGame() throws IOException {
@@ -77,15 +78,17 @@ public class EngineCommunicator {
 
     /**
      * Sets the position of the internal board of the engine to the given FEN.
+     *
      * @param position The position to set.
      * @throws IOException If it couldn't write to the engine.
      */
-    public void setPositionWithFen(String position) throws IOException{
+    public void setPositionWithFen(String position) throws IOException {
         sendCommand(MessageFormat.format("{0} fen {1}", "position", position)); // TODO: 2018-08-10 Switch to using startpos + moves
     }
 
     /**
      * Sets the position of the internal board of the engine to the start position and adding to it the given moves.
+     *
      * @param moves The moves played in the game.
      * @throws IOException If it couldn't write to the engine.
      */
@@ -95,6 +98,7 @@ public class EngineCommunicator {
 
     /**
      * Gets from the engine the best move for the current position.
+     *
      * @return The best move for the current position.
      * @throws IOException If it couldn't write to the engine.
      */
@@ -108,11 +112,11 @@ public class EngineCommunicator {
     /**
      * Shuts down the engine process.
      */
-    public void quit(){
-        try{
+    public void quit() {
+        try {
             sendCommand("quit");
 
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace(); // TODO: 2018-08-17 Log
             engineProcess.destroy();
         }

@@ -1,5 +1,7 @@
 package org.jhess.ui.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
@@ -14,10 +16,11 @@ import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.PieceType;
 import org.jhess.logic.GameAnalyser;
-import org.jhess.logic.Pgn.PgnConverter;
+import org.jhess.logic.pgn.PgnConverter;
 import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
+import org.jhess.ui.GameMoveListItem;
 import org.jhess.ui.panes.SquarePane;
 import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
@@ -43,6 +46,8 @@ public class PositionAnalyserController {
 
     private int gamePositionOffset = 0;
 
+    ObservableList<GameMoveListItem> gameMoveObservableList = FXCollections.observableArrayList();
+
     public PositionAnalyserController(Game game, PositionAnalyserWindow gameWindow) {
         this.game = game;
         this.gameWindow = gameWindow;
@@ -54,14 +59,9 @@ public class PositionAnalyserController {
      * Initiates the controller
      */
     private void initiate() {
-        gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
-        gameWindow.getBtnFlip().setOnMouseClicked(this::btnFlipClicked);
-        gameWindow.getBtnEngine().setOnMouseClicked(this::btnEngineClicked);
-        gameWindow.getBtnBack().setOnMouseClicked(this::btnBackClicked);
-        gameWindow.getBtnFwd().setOnMouseClicked(this::btnFwdClicked);
-        gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
-        gameWindow.getBtnCurrentPos().setOnMouseClicked(this::btnCurrentPosClicked);
-        gameWindow.getBtnContinue().setOnMouseClicked(this::btnContinueClicked);
+        initButtons();
+
+        gameWindow.getMoveList().setItems(gameMoveObservableList);
 
         drawBoard();
 
@@ -85,9 +85,24 @@ public class PositionAnalyserController {
     }
 
     /**
+     * Sets all of the button click handlers.
+     */
+    private void initButtons(){
+        gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
+        gameWindow.getBtnFlip().setOnMouseClicked(this::btnFlipClicked);
+        gameWindow.getBtnEngine().setOnMouseClicked(this::btnEngineClicked);
+        gameWindow.getBtnBack().setOnMouseClicked(this::btnBackClicked);
+        gameWindow.getBtnFwd().setOnMouseClicked(this::btnFwdClicked);
+        gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
+        gameWindow.getBtnCurrentPos().setOnMouseClicked(this::btnCurrentPosClicked);
+        gameWindow.getBtnContinue().setOnMouseClicked(this::btnContinueClicked);
+    }
+
+    /**
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn(Board newPosition, GameMove playedMove) {
+        gameMoveObservableList.add(new GameMoveListItem(playedMove, game.getCurrentPosition().getFullMoveNumber()));
         game.addTurn(newPosition, playedMove);
 
         GameAnalyser gameAnalyser = new GameAnalyser(game);
@@ -165,7 +180,7 @@ public class PositionAnalyserController {
 
         PgnConverter pgnConverter = new PgnConverter();
         for (GameMove gameMove : game.getMoveList()) {
-            moveList.add(pgnConverter.squareToPgn(gameMove.getSrcSquare()) + pgnConverter.squareToPgn(gameMove.getDestSquare()));
+            moveList.add(pgnConverter.moveToPgn(gameMove));
         }
 
         return moveList;
