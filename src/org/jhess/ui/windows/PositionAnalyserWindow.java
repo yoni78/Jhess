@@ -37,7 +37,16 @@ public class PositionAnalyserWindow {
         AnchorPane.setRightAnchor(boardPane.getGridPane(), 0.0);
         AnchorPane.setLeftAnchor(boardPane.getGridPane(), 0.0);
 
-        moveList.setPadding(new Insets(10));
+        moveList.setPrefWidth(100);
+
+        AnchorPane moveAnchorPane = new AnchorPane();
+        moveAnchorPane.getChildren().add(moveList);
+        moveAnchorPane.setPadding(new Insets(10));
+
+        AnchorPane.setTopAnchor(moveList, 0.0);
+        AnchorPane.setBottomAnchor(moveList, 0.0);
+        AnchorPane.setRightAnchor(moveList, 0.0);
+        AnchorPane.setLeftAnchor(moveList, 0.0);
 
         HBox controlsBox = new HBox();
         controlsBox.setPadding(new Insets(10));
@@ -45,16 +54,16 @@ public class PositionAnalyserWindow {
         controlsBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue, btnFlip, btnEngine);
 
         borderPane.setCenter(anchorPane);
-        borderPane.setRight(moveList);
+        borderPane.setRight(moveAnchorPane);
         borderPane.setBottom(controlsBox);
 
         Scene boardScene = new Scene(borderPane);
 
         stage.setMinHeight(600);
-        stage.setMinWidth(600);
+        stage.setMinWidth(650);
 
         stage.setHeight(600);
-        stage.setWidth(600);
+        stage.setWidth(650);
 
         stage.setScene(boardScene);
     }
