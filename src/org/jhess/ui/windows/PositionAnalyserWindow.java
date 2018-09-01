@@ -8,7 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import org.jhess.ui.GameMoveListItem;
+import org.jhess.ui.components.GameMoveListItem;
 import org.jhess.ui.panes.BoardPane;
 
 public class PositionAnalyserWindow {

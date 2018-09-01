@@ -16,11 +16,11 @@ import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
 import org.jhess.core.pieces.PieceType;
 import org.jhess.logic.GameAnalyser;
-import org.jhess.logic.pgn.PgnConverter;
 import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
-import org.jhess.ui.GameMoveListItem;
+import org.jhess.logic.pgn.PgnConverter;
+import org.jhess.ui.components.GameMoveListItem;
 import org.jhess.ui.panes.SquarePane;
 import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
@@ -62,6 +62,7 @@ public class PositionAnalyserController {
         initButtons();
 
         gameWindow.getMoveList().setItems(gameMoveObservableList);
+        gameWindow.getMoveList().setOnMouseClicked(this::moveListClicked);
 
         drawBoard();
 
@@ -87,7 +88,7 @@ public class PositionAnalyserController {
     /**
      * Sets all of the button click handlers.
      */
-    private void initButtons(){
+    private void initButtons() {
         gameWindow.getBoardPane().setOnMouseClicked(this::handleSquareClicked);
         gameWindow.getBtnFlip().setOnMouseClicked(this::btnFlipClicked);
         gameWindow.getBtnEngine().setOnMouseClicked(this::btnEngineClicked);
@@ -103,6 +104,7 @@ public class PositionAnalyserController {
      */
     private void nextTurn(Board newPosition, GameMove playedMove) {
         gameMoveObservableList.add(new GameMoveListItem(playedMove, game.getCurrentPosition().getFullMoveNumber()));
+
         game.addTurn(newPosition, playedMove);
 
         GameAnalyser gameAnalyser = new GameAnalyser(game);
@@ -165,9 +167,13 @@ public class PositionAnalyserController {
     /**
      * Draws the board in the correct orientation for the current player.
      */
+    private void drawBoard(int positionIndex) {
+        gameWindow.getBoardPane().drawBoard(game.getPositionList().get(positionIndex), reverseBoard);
+    }
+
     private void drawBoard() {
         int positionIndex = (game.getPositionList().size() - 1) + gamePositionOffset;
-        gameWindow.getBoardPane().drawBoard(game.getPositionList().get(positionIndex), reverseBoard);
+        drawBoard(positionIndex);
     }
 
     /**
@@ -349,6 +355,7 @@ public class PositionAnalyserController {
 
         drawBoard();
         highLightBestMove();
+        selectMoveListItem();
     }
 
     private void btnFwdClicked(MouseEvent mouseEvent) {
@@ -358,6 +365,7 @@ public class PositionAnalyserController {
 
         drawBoard();
         highLightBestMove();
+        selectMoveListItem();
     }
 
     private void btnCurrentPosClicked(MouseEvent mouseEvent) {
@@ -365,17 +373,37 @@ public class PositionAnalyserController {
 
         drawBoard();
         highLightBestMove();
+        selectMoveListItem();
     }
 
     private void btnRewindClicked(MouseEvent mouseEvent) {
         gamePositionOffset = -(game.getPositionList().size() - 1);
         drawBoard();
         highLightBestMove();
+        selectMoveListItem();
     }
 
     private void btnContinueClicked(MouseEvent mouseEvent) {
         game = new Game(game, game.getPositionList().size() + gamePositionOffset);
         gamePositionOffset = 0;
+
+        // Repopulate the move list with the new game moves
+        gameMoveObservableList.removeAll();
+        gameWindow.getMoveList().getItems().clear();
+
+        for (int i = 0; i < game.getMoveList().size(); i++) {
+            int fullMoveNumber = (i / 2) + 1;
+            gameMoveObservableList.add(new GameMoveListItem(game.getMoveList().get(i), fullMoveNumber));
+        }
     }
 
+    private void moveListClicked(MouseEvent mouseEvent) {
+        int currentMoveIndex = game.getPositionList().size() - 1;
+        gamePositionOffset = gameWindow.getMoveList().getSelectionModel().getSelectedIndex() + 1 - currentMoveIndex;
+        drawBoard();
+    }
+
+    private void selectMoveListItem() {
+        gameWindow.getMoveList().getSelectionModel().select((game.getMoveList().size() - 1) + gamePositionOffset);
+    }
 }

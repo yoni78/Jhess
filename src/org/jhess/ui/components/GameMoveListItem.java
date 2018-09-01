@@ -1,4 +1,4 @@
-package org.jhess.ui;
+package org.jhess.ui.components;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.moves.GameMove;
@@ -7,24 +7,24 @@ import org.jhess.logic.pgn.PgnConverter;
 import java.text.MessageFormat;
 
 /**
- * A Wrapper for the GameMove class to be used in a ListView
+ * A Wrapper for the GameMove class to be used in a ListView.
  */
 public class GameMoveListItem {
 
     private final GameMove gameMove;
-    private final int moveNumber;
+    private final int fullMoveNumber;
 
-    public GameMoveListItem(GameMove gameMove, int moveNumber) {
+    public GameMoveListItem(GameMove gameMove, int fullMoveNumber) {
         this.gameMove = gameMove;
-        this.moveNumber = moveNumber;
+        this.fullMoveNumber = fullMoveNumber;
     }
 
     public GameMove getGameMove() {
         return gameMove;
     }
 
-    public int getMoveNumber() {
-        return moveNumber;
+    public int getFullMoveNumber() {
+        return fullMoveNumber;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GameMoveListItem {
         PgnConverter pgnConverter = new PgnConverter();
 
         if (gameMove.getPlayedPiece().getAlliance() == Alliance.WHITE)
-            return MessageFormat.format("{0}. {1}", moveNumber, pgnConverter.moveToPgn(gameMove));
+            return MessageFormat.format("{0}. {1}", fullMoveNumber, pgnConverter.moveToPgn(gameMove));
         else
             return MessageFormat.format("\t...{0}", pgnConverter.moveToPgn(gameMove));
     }
