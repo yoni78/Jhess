@@ -2,8 +2,7 @@ package org.jhess.ui.windows;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -23,6 +22,10 @@ public class PositionAnalyserWindow {
     Button btnRewind = new Button("<<");
     Button btnCurrentPos = new Button(">>");
     Button btnContinue = new Button("Continue from here");
+
+    MenuBar menuBar = new MenuBar();
+    Menu engineMenu = new Menu("Engine");
+    MenuItem engineSelectMenuItem = new MenuItem("Select An Engine");
 
     ListView<GameMoveListItem> moveList = new ListView<>();
 
@@ -53,6 +56,11 @@ public class PositionAnalyserWindow {
         controlsBox.setSpacing(5);
         controlsBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue, btnFlip, btnEngine);
 
+        menuBar.prefWidthProperty().bind(stage.widthProperty());
+        menuBar.getMenus().add(engineMenu);
+        engineMenu.getItems().add(engineSelectMenuItem);
+
+        borderPane.setTop(menuBar);
         borderPane.setCenter(anchorPane);
         borderPane.setRight(moveAnchorPane);
         borderPane.setBottom(controlsBox);
@@ -106,5 +114,9 @@ public class PositionAnalyserWindow {
 
     public ListView<GameMoveListItem> getMoveList() {
         return moveList;
+    }
+
+    public MenuItem getEngineSelectMenuItem() {
+        return engineSelectMenuItem;
     }
 }

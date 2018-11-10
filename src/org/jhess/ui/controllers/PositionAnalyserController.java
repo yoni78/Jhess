@@ -2,11 +2,13 @@ package org.jhess.ui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import org.jhess.core.Alliance;
 import org.jhess.core.Game;
 import org.jhess.core.board.Board;
@@ -25,6 +27,7 @@ import org.jhess.ui.panes.SquarePane;
 import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -60,13 +63,14 @@ public class PositionAnalyserController {
      */
     private void initiate() {
         initButtons();
+        initMenu();
 
         gameWindow.getMoveList().setItems(gameMoveObservableList);
         gameWindow.getMoveList().setOnMouseClicked(this::moveListClicked);
 
         drawBoard();
 
-        initEngine();
+        // initEngine(); TODO: 2018-11-10 Use a default engine?
 
         highLightBestMove();
     }
@@ -74,9 +78,9 @@ public class PositionAnalyserController {
     /**
      * Starts the engine process and initializes the engine.
      */
-    private void initEngine() {
+    private void initEngine(String enginePath) {
         try {
-            engineCommunicator = new EngineCommunicator("C:\\Users\\Yoni.DESKTOP-9C58T0E\\Desktop\\stockfish-9-win\\Windows\\stockfish_9_x64.exe"); // TODO: 2018-08-10 Get the engine path from the user or default
+            engineCommunicator = new EngineCommunicator(enginePath);
             engineCommunicator.useUci();
             engineCommunicator.startNewGame();
 
@@ -97,6 +101,13 @@ public class PositionAnalyserController {
         gameWindow.getBtnRewind().setOnMouseClicked(this::btnRewindClicked);
         gameWindow.getBtnCurrentPos().setOnMouseClicked(this::btnCurrentPosClicked);
         gameWindow.getBtnContinue().setOnMouseClicked(this::btnContinueClicked);
+    }
+
+    /**
+     * Sets all of the menu items click handlers.
+     */
+    private void initMenu() {
+        gameWindow.getEngineSelectMenuItem().setOnAction(this::selectAnEngineClicked);
     }
 
     /**
@@ -336,6 +347,16 @@ public class PositionAnalyserController {
     }
 
     private void btnEngineClicked(MouseEvent mouseEvent) {
+
+        if (engineCommunicator == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error starting engine evaluation");
+            alert.setHeaderText(null);
+            alert.setContentText("No engine was selected!");
+            alert.showAndWait();
+            return;
+        }
+
         useEngine = !useEngine;
 
         if (useEngine) {
@@ -401,6 +422,14 @@ public class PositionAnalyserController {
         int currentMoveIndex = game.getPositionList().size() - 1;
         gamePositionOffset = gameWindow.getMoveList().getSelectionModel().getSelectedIndex() + 1 - currentMoveIndex;
         drawBoard();
+    }
+
+    private void selectAnEngineClicked(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select an engine executable");
+        File engineFile = fileChooser.showOpenDialog(gameWindow.getStage());
+
+        initEngine(engineFile.getAbsolutePath());
     }
 
     private void selectMoveListItem() {
