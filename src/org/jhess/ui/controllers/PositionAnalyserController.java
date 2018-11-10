@@ -13,6 +13,7 @@ import org.jhess.core.Alliance;
 import org.jhess.core.Game;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
+import org.jhess.core.engine.EngineInfo;
 import org.jhess.core.moves.GameMove;
 import org.jhess.core.moves.MoveAnalysis;
 import org.jhess.core.pieces.Piece;
@@ -24,6 +25,7 @@ import org.jhess.logic.moves.MovePerformer;
 import org.jhess.logic.pgn.PgnConverter;
 import org.jhess.ui.components.GameMoveListItem;
 import org.jhess.ui.panes.SquarePane;
+import org.jhess.ui.windows.EngineInfoWindow;
 import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
 
@@ -43,6 +45,7 @@ public class PositionAnalyserController {
     private boolean useEngine = false;
 
     private EngineCommunicator engineCommunicator;
+    private EngineInfo engineInfo;
 
     private SquarePane srcSquare = null;
     private Piece pieceToMove;
@@ -81,7 +84,7 @@ public class PositionAnalyserController {
     private void initEngine(String enginePath) {
         try {
             engineCommunicator = new EngineCommunicator(enginePath);
-            engineCommunicator.useUci();
+            engineInfo = engineCommunicator.useUci();
             engineCommunicator.startNewGame();
 
         } catch (IOException e) {
@@ -108,6 +111,7 @@ public class PositionAnalyserController {
      */
     private void initMenu() {
         gameWindow.getEngineSelectMenuItem().setOnAction(this::selectAnEngineClicked);
+        gameWindow.getEngineInfoMenuItem().setOnAction(this::engineInfoClicked);
     }
 
     /**
@@ -360,9 +364,9 @@ public class PositionAnalyserController {
         useEngine = !useEngine;
 
         if (useEngine) {
-            gameWindow.getBtnEngine().setText("Engine: on");
+            gameWindow.getBtnEngine().setText("engine: on");
         } else {
-            gameWindow.getBtnEngine().setText("Engine: off");
+            gameWindow.getBtnEngine().setText("engine: off");
         }
 
         drawBoard();
@@ -434,5 +438,9 @@ public class PositionAnalyserController {
 
     private void selectMoveListItem() {
         gameWindow.getMoveList().getSelectionModel().select((game.getMoveList().size() - 1) + gamePositionOffset);
+    }
+
+    private void engineInfoClicked(ActionEvent actionEvent) {
+        new EngineInfoWindow(engineInfo);
     }
 }

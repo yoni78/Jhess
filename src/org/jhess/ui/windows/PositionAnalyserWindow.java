@@ -16,7 +16,7 @@ public class PositionAnalyserWindow {
     private final BoardPane boardPane = new BoardPane();
 
     Button btnFlip = new Button("Flip Board");
-    Button btnEngine = new Button("Engine: off");
+    Button btnEngine = new Button("engine: off");
     Button btnBack = new Button("<");
     Button btnFwd = new Button(">");
     Button btnRewind = new Button("<<");
@@ -26,9 +26,11 @@ public class PositionAnalyserWindow {
     MenuBar menuBar = new MenuBar();
     Menu engineMenu = new Menu("Engine");
     MenuItem engineSelectMenuItem = new MenuItem("Select An Engine");
+    MenuItem engineInfoMenuItem = new MenuItem("Show Selected Engine Information");
 
     ListView<GameMoveListItem> moveList = new ListView<>();
 
+    // TODO: 2018-11-10 Split into 'init' methods
     public PositionAnalyserWindow() {
         stage.setTitle("Jhess - Position Analyser");
 
@@ -58,7 +60,7 @@ public class PositionAnalyserWindow {
 
         menuBar.prefWidthProperty().bind(stage.widthProperty());
         menuBar.getMenus().add(engineMenu);
-        engineMenu.getItems().add(engineSelectMenuItem);
+        engineMenu.getItems().addAll(engineSelectMenuItem, engineInfoMenuItem);
 
         borderPane.setTop(menuBar);
         borderPane.setCenter(anchorPane);
@@ -118,5 +120,9 @@ public class PositionAnalyserWindow {
 
     public MenuItem getEngineSelectMenuItem() {
         return engineSelectMenuItem;
+    }
+
+    public MenuItem getEngineInfoMenuItem() {
+        return engineInfoMenuItem;
     }
 }

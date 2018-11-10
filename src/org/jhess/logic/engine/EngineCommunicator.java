@@ -1,6 +1,7 @@
 package org.jhess.logic.engine;
 
 import com.google.common.collect.Iterables;
+import org.jhess.core.engine.EngineInfo;
 
 import java.io.*;
 import java.text.MessageFormat;
@@ -45,6 +46,7 @@ public class EngineCommunicator {
      */
     private List<String> readResponse(String expected) throws IOException {
         // TODO: 2018-08-04 Add a timeout
+        // TODO: 2018-11-10 Can you just look for a '\n'?
         List<String> lines = new ArrayList<>();
 
         while (true) {
@@ -57,14 +59,39 @@ public class EngineCommunicator {
     }
 
     /**
+     * Parses the information lines from a UCI engine.
+     *
+     * @param infoLines The information lines.
+     * @return An EngineInfo object which contains information about the engine.
+     */
+    private EngineInfo parseEngineInfo(List<String> infoLines) {
+
+        String name = "";
+        String author = "";
+
+        for (String line : infoLines) {
+            if (line.startsWith("id name")) {
+                name = line.substring(8);
+            } else if (line.startsWith("id author")) {
+                author = line.substring(10);
+            }
+        }
+
+        return new EngineInfo(name, author);
+    }
+
+    /**
      * Tells the engine to use the Universal Chess Interface.
      *
+     * @return Info about the engine.
      * @throws IOException If it couldn't write to the engine.
      */
-    public void useUci() throws IOException {
+    public EngineInfo useUci() throws IOException {
         // TODO: 2018-08-04 Store all available options?
         sendCommand("uci");
         List<String> response = readResponse("uciok");
+
+        return parseEngineInfo(response);
     }
 
     /**
@@ -83,7 +110,7 @@ public class EngineCommunicator {
      * @throws IOException If it couldn't write to the engine.
      */
     public void setPositionWithFen(String position) throws IOException {
-        sendCommand(MessageFormat.format("{0} fen {1}", "position", position)); // TODO: 2018-08-10 Switch to using startpos + moves
+        sendCommand(MessageFormat.format("{0} fen {1}", "position", position));
     }
 
     /**
