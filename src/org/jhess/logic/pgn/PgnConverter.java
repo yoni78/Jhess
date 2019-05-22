@@ -2,6 +2,7 @@ package org.jhess.logic.pgn;
 
 import org.jhess.core.Alliance;
 import org.jhess.core.board.Square;
+import org.jhess.core.game.Game;
 import org.jhess.core.moves.GameMove;
 import org.jhess.core.pieces.*;
 
@@ -140,10 +141,31 @@ public class PgnConverter {
     /**
      * Serializers a move to PGN format.
      *
-     * @param gameMove The move.
+     * @param gameMove The move to serialize.
      * @return The string which represents the move.
      */
-    public String moveToPgn(GameMove gameMove) {
-        return squareToPgn(gameMove.getSrcSquare()) + squareToPgn(gameMove.getDestSquare());
+    public String moveToPgn(Game game, GameMove gameMove) {
+
+        // TODO: Denote capture moves (also mate, check, etc...)
+        Piece playedPiece = gameMove.getPlayedPiece();
+        Square destSquare = gameMove.getDestSquare();
+
+        switch (playedPiece.getPieceType()) {
+            case PAWN:
+                return squareToPgn(destSquare);
+            case KNIGHT:
+                return MessageFormat.format("N{0}", destSquare);
+            case BISHOP:
+                return MessageFormat.format("B{0}", destSquare);
+            case ROOK:
+                return MessageFormat.format("R{0}", destSquare);
+            case QUEEN:
+                return MessageFormat.format("Q{0}", destSquare);
+            case KING:
+                return MessageFormat.format("K{0}", destSquare);
+
+            default:
+                return null;
+        }
     }
 }

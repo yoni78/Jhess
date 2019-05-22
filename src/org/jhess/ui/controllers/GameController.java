@@ -5,7 +5,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.jhess.core.Alliance;
-import org.jhess.core.Game;
+import org.jhess.core.game.Game;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.moves.GameMove;

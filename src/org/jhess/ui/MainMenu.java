@@ -3,7 +3,8 @@ package org.jhess.ui;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import org.jhess.core.Game;
+import org.jhess.core.game.Game;
+import org.jhess.core.game.GameDetails;
 import org.jhess.ui.controllers.GameController;
 import org.jhess.ui.controllers.PositionAnalyserController;
 import org.jhess.ui.windows.GameWindow;
@@ -17,7 +18,7 @@ public class MainMenu {
     }
 
     public void btnPositionAnalyserClicked(ActionEvent actionEvent) {
-        Game game = new Game();
+        Game game = new Game(new GameDetails());
         PositionAnalyserWindow gameWindow = new PositionAnalyserWindow();
         PositionAnalyserController gameController = new PositionAnalyserController(game, gameWindow);
 
@@ -25,7 +26,7 @@ public class MainMenu {
     }
 
     public void btnTwoPlayerGameClicked(ActionEvent actionEvent) {
-        Game game = new Game();
+        Game game = new Game(new GameDetails());
         GameWindow gameWindow = new GameWindow();
         GameController gameController = new GameController(game, gameWindow);
 

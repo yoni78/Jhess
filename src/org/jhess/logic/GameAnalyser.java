@@ -1,7 +1,7 @@
 package org.jhess.logic;
 
 import org.jhess.core.Alliance;
-import org.jhess.core.Game;
+import org.jhess.core.game.Game;
 import org.jhess.core.board.Board;
 import org.jhess.logic.board.PositionAnalyser;
 

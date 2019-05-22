@@ -1,7 +1,8 @@
-package org.jhess.core;
+package org.jhess.core.game;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import org.jhess.core.Alliance;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.BoardFactory;
 import org.jhess.core.moves.GameMove;
@@ -14,33 +15,37 @@ import java.util.List;
  */
 public class Game {
 
+    private final GameDetails gameDetails;
+
     private final List<GameMove> moveList;
     private final List<Board> positionList;
     private Alliance playerToMove = Alliance.WHITE;
 
-    public Game() {
-        this(new BoardFactory().createDefaultBoard());
-    }
-
-    public Game(Board startPosition){
+    public Game(Board startPosition, GameDetails gameDetails) {
+        this.gameDetails = gameDetails;
         moveList = new ArrayList<>();
         positionList = new ArrayList<>();
 
         positionList.add(startPosition);
     }
 
-    public Game(Game game, int lastMoveIndex){
+    public Game(GameDetails gameDetails) {
+        this(new BoardFactory().createDefaultBoard(), gameDetails);
+    }
+
+    public Game(Game game, int lastMoveIndex) {
+        gameDetails = game.gameDetails;
         moveList = new ArrayList<>(game.getMoveList().subList(0, lastMoveIndex - 1));
         positionList = new ArrayList<>(game.getPositionList().subList(0, lastMoveIndex));
 
         playerToMove = Iterables.getLast(positionList).getPlayerToMove();
     }
 
-    public Game(Game game){
+    public Game(Game game) {
         this(game, game.getPositionList().size());
     }
 
-    private void swapAlliance(){
+    private void swapAlliance() {
         playerToMove = playerToMove == Alliance.WHITE ? Alliance.BLACK : Alliance.WHITE;
     }
 
@@ -60,12 +65,17 @@ public class Game {
         return ImmutableList.copyOf(positionList);
     }
 
+    public GameDetails getGameDetails() {
+        return gameDetails;
+    }
+
     /**
      * Add a turn to the game.
+     *
      * @param newPosition The new position.
-     * @param playedMove The move that was played.
+     * @param playedMove  The move that was played.
      */
-    public void addTurn(Board newPosition, GameMove playedMove){
+    public void addTurn(Board newPosition, GameMove playedMove) {
         positionList.add(new BoardFactory().copyBoard(newPosition));
 
         moveList.add(playedMove);

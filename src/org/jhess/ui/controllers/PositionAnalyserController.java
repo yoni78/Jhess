@@ -8,9 +8,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jhess.core.Alliance;
-import org.jhess.core.Game;
+import org.jhess.core.game.Game;
 import org.jhess.core.board.Board;
 import org.jhess.core.board.Square;
 import org.jhess.core.engine.EngineInfo;
@@ -23,6 +24,7 @@ import org.jhess.logic.engine.EngineCommunicator;
 import org.jhess.logic.moves.MoveAnalyser;
 import org.jhess.logic.moves.MovePerformer;
 import org.jhess.logic.pgn.PgnConverter;
+import org.jhess.logic.pgn.PgnWriter;
 import org.jhess.ui.components.GameMoveListItem;
 import org.jhess.ui.panes.SquarePane;
 import org.jhess.ui.windows.EngineInfoWindow;
@@ -30,8 +32,10 @@ import org.jhess.ui.windows.PositionAnalyserWindow;
 import org.jhess.ui.windows.PromotionWindow;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +71,7 @@ public class PositionAnalyserController {
     private void initiate() {
         initButtons();
         initMenu();
+        initGameDetails();
 
         gameWindow.getMoveList().setItems(gameMoveObservableList);
         gameWindow.getMoveList().setOnMouseClicked(this::moveListClicked);
@@ -112,13 +117,21 @@ public class PositionAnalyserController {
     private void initMenu() {
         gameWindow.getEngineSelectMenuItem().setOnAction(this::selectAnEngineClicked);
         gameWindow.getEngineInfoMenuItem().setOnAction(this::engineInfoClicked);
+        gameWindow.getSavePgnMenuItem().setOnAction(this::savePgnClicked);
+    }
+
+    /**
+     * Sets all of the details of the game.
+     */
+    private void initGameDetails(){
+        game.getGameDetails().setDate(LocalDateTime.now());
     }
 
     /**
      * Changes the currentPlayer to the alliance of the player who should play next.
      */
     private void nextTurn(Board newPosition, GameMove playedMove) {
-        gameMoveObservableList.add(new GameMoveListItem(playedMove, game.getCurrentPosition().getFullMoveNumber()));
+        gameMoveObservableList.add(new GameMoveListItem(game, playedMove, game.getCurrentPosition().getFullMoveNumber()));
 
         game.addTurn(newPosition, playedMove);
 
@@ -201,7 +214,7 @@ public class PositionAnalyserController {
 
         PgnConverter pgnConverter = new PgnConverter();
         for (GameMove gameMove : game.getMoveList()) {
-            moveList.add(pgnConverter.moveToPgn(gameMove));
+            moveList.add(pgnConverter.moveToPgn(game, gameMove));
         }
 
         return moveList;
@@ -344,6 +357,10 @@ public class PositionAnalyserController {
         rightMouseClicked();
     }
 
+    private void selectMoveListItem() {
+        gameWindow.getMoveList().getSelectionModel().select((game.getMoveList().size() - 1) + gamePositionOffset);
+    }
+
     private void btnFlipClicked(MouseEvent mouseEvent) {
         reverseBoard = !reverseBoard;
         drawBoard();
@@ -418,7 +435,7 @@ public class PositionAnalyserController {
 
         for (int i = 0; i < game.getMoveList().size(); i++) {
             int fullMoveNumber = (i / 2) + 1;
-            gameMoveObservableList.add(new GameMoveListItem(game.getMoveList().get(i), fullMoveNumber));
+            gameMoveObservableList.add(new GameMoveListItem(game, game.getMoveList().get(i), fullMoveNumber));
         }
     }
 
@@ -436,11 +453,25 @@ public class PositionAnalyserController {
         initEngine(engineFile.getAbsolutePath());
     }
 
-    private void selectMoveListItem() {
-        gameWindow.getMoveList().getSelectionModel().select((game.getMoveList().size() - 1) + gamePositionOffset);
-    }
-
     private void engineInfoClicked(ActionEvent actionEvent) {
         new EngineInfoWindow(engineInfo);
+    }
+
+    private void savePgnClicked(ActionEvent actionEvent) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File destDir = directoryChooser.showDialog(this.gameWindow.getStage());
+
+        PgnWriter pgnWriter = new PgnWriter(game);
+        try{
+            if (destDir != null)
+                pgnWriter.writeToFile(destDir.getAbsolutePath());
+
+        } catch (FileNotFoundException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Output error");
+            alert.setHeaderText(null);
+            alert.setContentText("Output directory not found!");
+            alert.showAndWait();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.jhess.ui.components;
 
 import org.jhess.core.Alliance;
+import org.jhess.core.game.Game;
 import org.jhess.core.moves.GameMove;
 import org.jhess.logic.pgn.PgnConverter;
 
@@ -11,12 +12,18 @@ import java.text.MessageFormat;
  */
 public class GameMoveListItem {
 
+    private final Game game;
     private final GameMove gameMove;
     private final int fullMoveNumber;
 
-    public GameMoveListItem(GameMove gameMove, int fullMoveNumber) {
+    public GameMoveListItem(Game game, GameMove gameMove, int fullMoveNumber) {
+        this.game = game;
         this.gameMove = gameMove;
         this.fullMoveNumber = fullMoveNumber;
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     public GameMove getGameMove() {
@@ -32,8 +39,8 @@ public class GameMoveListItem {
         PgnConverter pgnConverter = new PgnConverter();
 
         if (gameMove.getPlayedPiece().getAlliance() == Alliance.WHITE)
-            return MessageFormat.format("{0}. {1}", fullMoveNumber, pgnConverter.moveToPgn(gameMove));
+            return MessageFormat.format("{0}. {1}", fullMoveNumber, pgnConverter.moveToPgn(game, gameMove));
         else
-            return MessageFormat.format("\t...{0}", pgnConverter.moveToPgn(gameMove));
+            return MessageFormat.format("\t...{0}", pgnConverter.moveToPgn(game, gameMove));
     }
 }

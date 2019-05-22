@@ -24,9 +24,14 @@ public class PositionAnalyserWindow {
     Button btnContinue = new Button("Continue from here");
 
     MenuBar menuBar = new MenuBar();
+
     Menu engineMenu = new Menu("Engine");
     MenuItem engineSelectMenuItem = new MenuItem("Select An Engine");
     MenuItem engineInfoMenuItem = new MenuItem("Show Selected Engine Information");
+
+    Menu fileMenu = new Menu("File");
+
+    MenuItem savePgnMenuItem = new MenuItem("Save Game As PGN");
 
     ListView<GameMoveListItem> moveList = new ListView<>();
 
@@ -59,7 +64,8 @@ public class PositionAnalyserWindow {
         controlsBox.getChildren().addAll(btnRewind, btnBack, btnFwd, btnCurrentPos, btnContinue, btnFlip, btnEngine);
 
         menuBar.prefWidthProperty().bind(stage.widthProperty());
-        menuBar.getMenus().add(engineMenu);
+        menuBar.getMenus().addAll(fileMenu, engineMenu);
+        fileMenu.getItems().addAll(savePgnMenuItem);
         engineMenu.getItems().addAll(engineSelectMenuItem, engineInfoMenuItem);
 
         borderPane.setTop(menuBar);
@@ -124,5 +130,9 @@ public class PositionAnalyserWindow {
 
     public MenuItem getEngineInfoMenuItem() {
         return engineInfoMenuItem;
+    }
+
+    public MenuItem getSavePgnMenuItem() {
+        return savePgnMenuItem;
     }
 }
